@@ -1,0 +1,115 @@
+# Security Checklist - OpenProject MCP Server
+
+## Pre-Commit Security Verification ✅
+
+### 🔐 Secrets and Sensitive Data
+- [ ] No `.env` files committed (only `.env.example` allowed)
+- [ ] No API keys or tokens in code
+- [ ] No private keys (`.key`, `.pem` files) committed
+- [ ] No password or secret files committed
+- [ ] All sensitive data properly ignored in `.gitignore`
+
+### 📁 Configuration Files
+- [ ] `.dev.vars` excluded from version control
+- [ ] `.mcp.json` renamed to `.mcp.json.example` (template only)
+- [ ] Cloud provider config files (`.aws/`, `.gcloud/`, etc.) excluded
+- [ ] Kubernetes configs with secrets excluded
+
+### 🛠️ Development Files
+- [ ] `node_modules/` ignored
+- [ ] Build outputs (`dist/`, `.wrangler/`) ignored
+- [ ] IDE files appropriately handled (`.vscode/` partially ignored)
+- [ ] OS files (`.DS_Store`, `Thumbs.db`) ignored
+
+### 🏢 Enterprise Security
+- [ ] Security scanning results ignored (`.snyk`, `*-report*.json`)
+- [ ] CI/CD logs and artifacts ignored
+- [ ] Personal development files appropriately scoped
+- [ ] Backup and temporary files ignored
+
+## Files That SHOULD Be Included ✅
+
+### Essential Documentation
+- [x] `README.md` - Project documentation
+- [x] `CLAUDE.md` - Project instructions for AI agents
+- [x] `LESSONS.yaml` - Project learnings and insights
+- [x] `CHANGELOG.md` - Version history
+- [x] `LICENSE` - Legal requirements
+
+### Configuration Templates
+- [x] `.env.example` - Environment configuration template
+- [x] `.mcp.json.example` - MCP configuration template
+- [x] `caddy-root.crt` - Development TLS certificate (public)
+
+### Project Structure
+- [x] Source code (`src/`)
+- [x] Tests (`tests/`)
+- [x] Package configuration (`package.json`, `package-lock.json`)
+- [x] TypeScript configuration (`tsconfig.json`)
+- [x] ESLint configuration (`eslint.config.js`)
+
+## Pre-Deployment Security Actions
+
+### 1. Environment Validation
+```bash
+# Verify no secrets in code
+git log --all --grep="password\|secret\|token\|key" --oneline
+rg -i "(password|secret|token|api[_-]?key)" --type js --type ts src/
+
+# Check for accidentally committed env files
+find . -name "*.env" ! -name "*.env.example" ! -path "*/node_modules/*"
+```
+
+### 2. Dependency Security Audit
+```bash
+# Run security audit
+npm audit --audit-level=moderate
+
+# Check for known vulnerabilities
+npm run security:check # (if implemented)
+```
+
+### 3. Access Control Verification
+```bash
+# Verify CORS settings are restrictive
+grep -r "ALLOWED_ORIGINS" src/
+grep -r "\*" src/ | grep -i cors
+```
+
+## Incident Response
+
+If sensitive data is accidentally committed:
+
+### Immediate Actions
+1. **DO NOT** push to remote repository
+2. Remove sensitive data from commit history:
+   ```bash
+   git filter-branch --force --index-filter \
+     'git rm --cached --ignore-unmatch PATH/TO/SENSITIVE/FILE' \
+     --prune-empty --tag-name-filter cat -- --all
+   ```
+3. Force push (if remote exists): `git push --force-with-lease`
+4. Rotate any exposed credentials immediately
+
+### Prevention
+- Use pre-commit hooks for automated scanning
+- Regular security training for team members
+- Implement automated secret scanning in CI/CD
+
+## Contact Information
+
+**Security Issues:** Report immediately to project maintainers
+**Emergency Contact:** [Your security team contact]
+
+---
+
+## Compliance Notes
+
+This project follows enterprise security best practices including:
+- OWASP guidelines for secure development
+- Industry standard secret management practices  
+- Principle of least privilege for access controls
+- Defense in depth security architecture
+
+**Last Updated:** $(date)
+**Reviewed By:** [Maintainer Name]

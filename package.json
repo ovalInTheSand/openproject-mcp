@@ -1,0 +1,70 @@
+{
+  "name": "openproject-mcp",
+  "version": "2.0.0",
+  "description": "Professional MCP server for OpenProject API integration with enterprise project management capabilities",
+  "keywords": [
+    "mcp",
+    "openproject",
+    "project-management",
+    "claude",
+    "ai",
+    "enterprise",
+    "pmbok",
+    "portfolio"
+  ],
+  "author": "Adam Sandoval <adam@thisistheway.local>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/user/private-openproject-mcp.git"
+  },
+  "homepage": "#",
+  "bugs": {
+    "url": "#"
+  },
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "NODE_EXTRA_CA_CERTS=./caddy-root.crt wrangler dev --port=8788 --local",
+    "dev:remote": "NODE_EXTRA_CA_CERTS=./caddy-root.crt wrangler dev --port=8788",
+    "dev:clean": "npm run clean && npm run dev",
+    "build": "tsc --noEmit && echo 'Build validation passed'",
+    "deploy": "npm run build && wrangler deploy",
+    "deploy:staging": "npm run build && wrangler deploy --env staging",
+    "start": "NODE_EXTRA_CA_CERTS=./caddy-root.crt wrangler dev --port=8788",
+    "restart": "pkill -f wrangler || true && npm run dev",
+    "typecheck": "tsc --noEmit",
+    "typecheck:watch": "tsc --noEmit --watch",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "test": "node tests/run-tests.js",
+    "test:health": "node tests/health.test.js",
+    "test:integration": "node tests/integration.test.js",
+    "test:enterprise": "node tests/enterprise.test.js",
+    "test:edge-cases": "node tests/edge-cases.test.js",
+    "test:watch": "npm run test",
+    "validate": "node scripts/validate-deployment.js",
+    "inspect": "MCP_AUTO_OPEN_ENABLED=false CLIENT_PORT=7000 SERVER_PORT=7001 npx @modelcontextprotocol/inspector",
+    "inspect:open": "CLIENT_PORT=7000 SERVER_PORT=7001 npx @modelcontextprotocol/inspector",
+    "clean": "rm -rf dist .wrangler",
+    "clean:all": "rm -rf dist .wrangler node_modules && npm install",
+    "health": "curl -X POST http://localhost:8788/mcp -H 'Content-Type: application/json' -d '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/call\",\"params\":{\"name\":\"op.health\",\"arguments\":{}}}' | jq",
+    "version": "echo 'v2.0.0 - Professional Private Use Package'",
+    "update-deps": "npm update && npm audit fix"
+  },
+  "dependencies": {
+    "@hono/mcp": "^0.1.2",
+    "@modelcontextprotocol/sdk": "^1.17.4",
+    "@sentry/cloudflare": "^10.5.0",
+    "hono": "^4.5.5",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240821.0",
+    "@typescript-eslint/eslint-plugin": "^8.41.0",
+    "@typescript-eslint/parser": "^8.41.0",
+    "eslint": "^9.34.0",
+    "typescript": "^5.5.4",
+    "wrangler": "^4.33.0"
+  }
+}

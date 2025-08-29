@@ -1,0 +1,54 @@
+# ============================================================================
+# ESLint Ignore - OpenProject MCP Server
+# ============================================================================
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build outputs
+dist/
+build/
+out/
+.wrangler/
+
+# Generated files
+*.generated.js
+*.generated.ts
+*.d.ts
+
+# Third-party and vendor code
+vendor/
+third-party/
+**/lib/
+**/libs/
+
+# Test fixtures and mock data
+**/fixtures/
+**/mocks/
+**/__fixtures__/
+**/__mocks__/
+
+# Configuration files that shouldn't be linted
+wrangler.jsonc
+tsconfig.json
+*.config.js
+
+# Temporary and cache files
+.cache/
+.tmp/
+temp/
+*.tmp
+*.temp
+
+# Coverage reports
+coverage/
+.nyc_output/
+
+# IDE generated files
+.vscode/
+.idea/
+
+# Enterprise tooling outputs
+security-report*.js
+audit-report*.js

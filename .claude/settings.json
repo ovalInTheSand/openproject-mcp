@@ -1,0 +1,20 @@
+{
+  "$schema": "https://schemas.anthropic.com/claude-code/settings.schema.json",
+  "permissions": {
+    "allowedTools": [
+      "Read", "Search", "Edit", "MultiEdit",
+      "Bash(npm:*)", "Bash(pnpm:*)", "Bash(yarn:*)",
+      "Bash(curl:https://thisistheway.local/*)"
+    ],
+    "disallowedTools": [
+      "Bash(rm -rf *)", "Bash(git push --force*)",
+      "WebFetch(http://*)"
+    ],
+    "write": {
+      "allowed": ["src/**", "wrangler.jsonc", "package*.json", "tsconfig.json", "docs/**", ".claude/**"],
+      "denied": ["**/*.env", "**/secrets/**", "**/node_modules/**", "**/dist/**"]
+    }
+  },
+  "cleanupPeriodDays": 7,
+  "model": "claude-3.7-sonnet"
+}

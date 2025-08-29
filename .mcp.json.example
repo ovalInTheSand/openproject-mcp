@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "openproject-mcp": {
+      "transport": "http",
+      "url": "http://localhost:8788/mcp"
+    }
+  }
+}

@@ -1,0 +1,77 @@
+# ============================================================================
+# NPM Ignore - OpenProject MCP Server
+# ============================================================================
+# Files to exclude from npm package distribution
+
+# Development and testing
+src/
+tests/
+test/
+*.test.js
+*.test.ts
+*.spec.js
+*.spec.ts
+jest.config.js
+vitest.config.ts
+
+# Development configuration
+.dev.vars
+.env
+.env.*
+!.env.example
+.eslintignore
+.eslintrc*
+.prettierrc*
+tsconfig.json
+tsconfig.*.json
+
+# Build and tooling
+.wrangler/
+wrangler.toml
+wrangler.jsonc
+scripts/
+docs/
+coverage/
+.nyc_output/
+
+# Development files
+CLAUDE.md
+LESSONS.yaml
+.claude/
+.mcp.json
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Git files
+.gitignore
+.gitattributes
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+circle.yml
+
+# Security and enterprise tooling
+.snyk
+audit-report*.json
+security-report*.json
+
+# Temporary and cache files
+.cache/
+.tmp/
+temp/
+*.log
+*.pid
+
+# Only include essential files for distribution:
+# - package.json
+# - package-lock.json (optional)
+# - README.md
+# - LICENSE
+# - dist/ (compiled output)
+# - .env.example (configuration template)
