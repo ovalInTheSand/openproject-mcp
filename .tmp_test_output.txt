@@ -1,0 +1,1039 @@
+
+🚀 OpenProject MCP Server - Test Suite Runner
+============================================================
+
+📡 Checking server availability...
+✅ Server responding at http://localhost:8788/mcp (405)
+
+📋 Found 11 test files:
+   - cache-performance.test.js
+   - edge-cases.test.js
+   - enterprise-math.test.js
+   - enterprise.test.js
+   - health.test.js
+   - hybrid-system.test.js
+   - hybrid-tools.test.js
+   - integration.test.js
+   - live-validation.test.js
+   - v3-comprehensive.test.js
+   - variable-management.test.js
+
+🧪 Running cache-performance.test.js...
+──────────────────────────────────────────────────
+🚀 OpenProject MCP v3.0.0 - Cache Performance Tests
+================================================================================
+
+📋 Test Configuration:
+   Base URL: https://thisistheway.local
+   Test Project ID: 1
+   Performance iterations: 10
+   Concurrency level: 5
+   API Key: [CONFIGURED]
+
+⚠️  WARNING: No real API key provided. Cache tests will use mock/limited data.
+   Set OP_API_KEY environment variable for full cache testing with real OpenProject data.
+
+🧪 Running Cache Performance Tests...
+
+
+🧪 Running: 1. Basic Cache Operations
+   🗄️  Testing basic cache operations...
+   ✅ Basic set/get operations working
+   📊 Cache statistics:
+     📦 Total entries: 1
+     💾 Memory usage: 1KB
+     🎯 Hit rate: 0
+✅ PASSED: 1. Basic Cache Operations
+
+🧪 Running: 2. TTL Expiration and Cleanup
+   ⏰ Testing TTL expiration and cleanup...
+   ✅ Data available immediately after set
+   ⏳ Waiting for TTL expiration (1.5s)...
+   ✅ Data expired after TTL
+   ✅ Session data persists beyond TTL test duration
+✅ PASSED: 2. TTL Expiration and Cleanup
+
+🧪 Running: 3. Cache Performance Under Load
+   🚀 Testing cache performance under load...
+   ⚡ Bulk SET: 10 operations in 0.19ms
+     📈 Rate: 53023 ops/second
+   ⚡ Bulk GET: 10 operations in 0.21ms
+     📈 Rate: 48402 ops/second
+     🎯 Hit rate: 100.0%
+✅ PASSED: 3. Cache Performance Under Load
+
+🧪 Running: 4. Concurrent Access Patterns
+   🔄 Testing concurrent access patterns...
+   ✅ Concurrent access completed:
+     👥 Workers: 5
+     ⚡ Operations per worker: 10 (set + get)
+     ⏱️  Total duration: 0ms
+     📊 Total operations: 50
+     🗄️  Final cache entries: 25
+✅ PASSED: 4. Concurrent Access Patterns
+
+🧪 Running: 5. Cache Warming Strategies
+   🔥 Testing cache warming strategies...
+   ⚡ Cache warming completed:
+     📁 Projects warmed: 3
+     ⏱️  Warming duration: 1ms
+     🗄️  Cache entries after warming: 9
+   ⚡ Post-warming access:
+     ⏱️  Access duration: 0ms
+     📊 Warming markers found: 0
+✅ PASSED: 5. Cache Warming Strategies
+
+🧪 Running: 6. Cache Invalidation Scenarios
+   🗑️  Testing cache invalidation scenarios...
+   📦 Set 5 test cache entries
+   🎯 Testing pattern-based invalidation...
+     🗄️  Entries remaining after EVM invalidation: 3
+   📁 Testing project-specific invalidation...
+     🗄️  Entries remaining after project-1 clear: 1
+   🧹 Final cache entries after clearAll: 0
+✅ PASSED: 6. Cache Invalidation Scenarios
+
+🧪 Running: 7. Cache Health Monitoring
+   🏥 Testing cache health monitoring...
+   📦 Set up test cache entries
+   🏥 Cache health status:
+     🚥 Status: warning
+     ⚠️  Issues: 2
+     💡 Recommendations: 2
+   📊 Detailed statistics:
+     📦 Total entries: 4
+     💀 Expired entries: 2
+     💾 Memory usage: 4KB
+     🎯 Hit rate: 0
+     🏆 Top calculation types: normal-1:1, normal-2:1, short-1:1, short-2:1
+   ⚠️  Health issues detected:
+     1. High ratio of expired entries
+     2. Low cache hit rate
+   💡 Health recommendations:
+     1. Consider adjusting TTL values for better performance
+     2. Review caching strategy and TTL values
+✅ PASSED: 7. Cache Health Monitoring
+
+🧪 Running: 8. Real-World Usage Patterns
+❌ FAILED: 8. Real-World Usage Patterns
+   Error: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/native-extractor.js' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/hybrid-manager.ts
+❌ Cache performance test suite failed: Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/native-extractor.js' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/hybrid-manager.ts
+    at finalizeResolution (node:internal/modules/esm/resolve:274:11)
+    at moduleResolve (node:internal/modules/esm/resolve:859:10)
+    at defaultResolve (node:internal/modules/esm/resolve:983:11)
+    at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:783:12)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:707:25)
+    at ModuleLoader.resolve (node:internal/modules/esm/loader:690:38)
+    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:307:38)
+    at ModuleJob._link (node:internal/modules/esm/module_job:183:49) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/native-extractor.js'
+}
+
+🧪 Running edge-cases.test.js...
+──────────────────────────────────────────────────
+
+🔍 OpenProject MCP Server - Edge Cases & Security Test Suite
+=================================================================
+Testing for security vulnerabilities, edge cases, and robustness
+
+
+🔒 Testing package.json security...
+TAP version 13
+   ✅ Package security checks passed
+
+🌐 Testing environment configuration...
+# Subtest: Edge Case: Package.json Security Validation
+ok 1 - Edge Case: Package.json Security Validation
+  ---
+  duration_ms: 6.973611
+  type: 'test'
+  ...
+   ✅ Environment security checks passed
+
+🔍 Testing TypeScript configuration...
+# Subtest: Edge Case: Environment Configuration Validation
+ok 2 - Edge Case: Environment Configuration Validation
+  ---
+  duration_ms: 9.633792
+  type: 'test'
+  ...
+   ✅ TypeScript configuration checks passed
+
+📁 Testing file structure...
+# Subtest: Edge Case: TypeScript Configuration Validation
+ok 3 - Edge Case: TypeScript Configuration Validation
+  ---
+  duration_ms: 3.646272
+  type: 'test'
+  ...
+   ✅ package.json exists
+   ✅ README.md exists
+   ✅ LICENSE exists
+   ✅ src/index.ts exists
+   ✅ src/server.ts exists
+   ✅ File structure validation passed
+
+🛡️  Testing code injection prevention...
+# Subtest: Edge Case: File Structure and Permissions
+ok 4 - Edge Case: File Structure and Permissions
+  ---
+  duration_ms: 22.371724
+  type: 'test'
+  ...
+   ✅ Code injection prevention checks passed
+
+🌐 Testing CORS security...
+# Subtest: Edge Case: Code Injection Prevention
+ok 5 - Edge Case: Code Injection Prevention
+  ---
+  duration_ms: 5.105419
+  type: 'test'
+  ...
+   ✅ CORS security checks passed
+
+📦 Testing dependency security...
+# Subtest: Edge Case: CORS Configuration Security
+ok 6 - Edge Case: CORS Configuration Security
+  ---
+  duration_ms: 3.729442
+  type: 'test'
+  ...
+   ✅ Dependency security checks passed (11 dependencies)
+
+⚡ Testing resource exhaustion prevention...
+# Subtest: Edge Case: Dependency Security Check
+ok 7 - Edge Case: Dependency Security Check
+  ---
+  duration_ms: 4.011701
+  type: 'test'
+  ...
+   ✅ Resource exhaustion prevention checks passed
+
+🔧 Testing tool registration edge cases...
+# Subtest: Edge Case: Resource Exhaustion Prevention
+ok 8 - Edge Case: Resource Exhaustion Prevention
+  ---
+  duration_ms: 4.335321
+  type: 'test'
+  ...
+   ✅ Tool registration checks passed (90 tools)
+# Subtest: Edge Case: Tool Registration Validation
+ok 9 - Edge Case: Tool Registration Validation
+  ---
+  duration_ms: 3.560842
+  type: 'test'
+  ...
+1..9
+# tests 9
+# suites 0
+# pass 9
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 73.671614
+
+🧪 Running enterprise-math.test.js...
+──────────────────────────────────────────────────
+
+🧮 OpenProject MCP Server - Enterprise Mathematics Test Suite
+=================================================================
+Testing endpoint: http://localhost:8788/mcp
+Testing mathematical accuracy of enterprise features with no shortcuts
+All formulas validated against PMBOK and industry standards
+
+
+📊 Testing EVM Mathematical Accuracy...
+   Testing Core EVM Formulas...
+   ✅ Core EVM formulas validated
+   Testing EAC Forecast Methods...
+   ✅ EAC forecast methods validated
+   Testing TCPI Calculations...
+   ✅ TCPI calculations validated
+✅ EVM Formula Accuracy Test: PASSED
+
+🔄 Testing Critical Path Algorithm...
+   ✅ Forward pass algorithm validated
+   ✅ Backward pass algorithm validated
+   ✅ Float calculations validated
+✅ Critical Path Analysis Test: PASSED
+
+🔮 Testing Predictive Analytics Models...
+   Testing Heuristic Model...
+   Testing Pattern Matching...
+   Testing Decision Tree...
+   ✅ Heuristic model validated
+   ✅ Pattern matching validated
+   ✅ Decision tree validated
+✅ Predictive Analytics Test: PASSED
+
+💼 Testing Portfolio Resource Balancing...
+   Testing Utilization Calculations...
+   Testing Rebalancing Algorithm...
+   ✅ Utilization calculations validated
+   ✅ Overallocation detection validated
+   ✅ Rebalancing algorithm validated
+✅ Portfolio Resource Balancing Test: PASSED
+
+⚠️  Testing Risk Assessment Mathematics...
+   Testing PERT Estimation...
+   Testing Standard Deviation...
+   Testing Confidence Intervals...
+   ✅ PERT estimation validated
+   ✅ Standard deviation validated
+   ✅ Confidence intervals validated
+✅ Risk Assessment Test: PASSED
+
+📈 Testing Advanced EVM Scenarios...
+   Testing EAC Method Variations...
+   ✅ Multiple EAC methods validated
+   Testing TCPI Calculations...
+   ✅ TCPI calculations validated for multiple scenarios
+✅ Advanced EVM Scenarios Test: PASSED
+
+🎯 Testing EVM Edge Cases...
+   Testing Zero PV Edge Case...
+   ✅ Zero PV edge case handled
+   Testing Project Completion...
+   ✅ Project completion scenarios validated
+   Testing Over-budget Scenarios...
+   ✅ Over-budget scenarios validated
+✅ EVM Edge Cases Test: PASSED
+
+⏰ Testing Time-Based EVM Calculations...
+   ✅ Time-based SPI_t calculations validated
+   ✅ Earned Schedule methodology validated
+✅ Time-Based EVM Test: PASSED
+
+🎲 Testing Enhanced Monte Carlo Simulation...
+   Testing Known Distribution Accuracy...
+   ✅ PERT baseline calculations validated
+   Testing Monte Carlo Statistical Properties...
+   ✅ Monte Carlo statistical properties validated
+   Testing Confidence Intervals...
+   ✅ Confidence interval calculations validated
+✅ Enhanced Monte Carlo Test: PASSED
+
+🌪️ Testing Sensitivity Analysis...
+   Testing Individual Risk Factor Sensitivity...
+   ✅ Risk factor sensitivities calculated
+   Testing Risk Correlation Effects...
+   ✅ Risk correlation effects calculated
+   Testing Sensitivity Rankings...
+   ✅ Sensitivity rankings validated
+✅ Sensitivity Analysis Test: PASSED
+
+📊 Testing Risk Scoring Matrix...
+   Testing Risk Score Calculations...
+   ✅ Risk scoring methods validated
+   Testing Risk Matrix Boundaries...
+   ✅ Risk matrix boundaries validated
+✅ Risk Scoring Matrix Test: PASSED
+TAP version 13
+# Subtest: EVM Formula Accuracy - PMBOK Standards
+ok 1 - EVM Formula Accuracy - PMBOK Standards
+  ---
+  duration_ms: 2.448917
+  type: 'test'
+  ...
+# Subtest: Critical Path Analysis - Algorithm Accuracy
+ok 2 - Critical Path Analysis - Algorithm Accuracy
+  ---
+  duration_ms: 1.079527
+  type: 'test'
+  ...
+# Subtest: Predictive Analytics - Model Accuracy
+ok 3 - Predictive Analytics - Model Accuracy
+  ---
+  duration_ms: 1.342665
+  type: 'test'
+  ...
+# Subtest: Portfolio Resource Balancing - Mathematical Accuracy
+ok 4 - Portfolio Resource Balancing - Mathematical Accuracy
+  ---
+  duration_ms: 1.155955
+  type: 'test'
+  ...
+# Subtest: Risk Assessment - Mathematical Accuracy
+ok 5 - Risk Assessment - Mathematical Accuracy
+  ---
+  duration_ms: 1.171346
+  type: 'test'
+  ...
+# Subtest: Advanced EVM Scenarios - Multiple EAC Calculation Methods
+ok 6 - Advanced EVM Scenarios - Multiple EAC Calculation Methods
+  ---
+  duration_ms: 1.114965
+  type: 'test'
+  ...
+# Subtest: EVM Performance Indices - Edge Cases and Boundary Conditions
+ok 7 - EVM Performance Indices - Edge Cases and Boundary Conditions
+  ---
+  duration_ms: 2.858799
+  type: 'test'
+  ...
+# Subtest: Time-Based EVM - Schedule Performance Index (SPI_t)
+ok 8 - Time-Based EVM - Schedule Performance Index (SPI_t)
+  ---
+  duration_ms: 0.746391
+  type: 'test'
+  ...
+# Subtest: Enhanced Monte Carlo Simulation - Statistical Validation
+ok 9 - Enhanced Monte Carlo Simulation - Statistical Validation
+  ---
+  duration_ms: 10.231623
+  type: 'test'
+  ...
+# Subtest: Sensitivity Analysis - Tornado Diagram Mathematics
+ok 10 - Sensitivity Analysis - Tornado Diagram Mathematics
+  ---
+  duration_ms: 5.085717
+  type: 'test'
+  ...
+# Subtest: Risk Scoring Matrix - Probability Impact Mathematics
+ok 11 - Risk Scoring Matrix - Probability Impact Mathematics
+  ---
+  duration_ms: 5.258274
+  type: 'test'
+  ...
+1..11
+# tests 11
+# suites 0
+# pass 11
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 54.751667
+
+🧪 Running enterprise.test.js...
+──────────────────────────────────────────────────
+
+🏢 OpenProject MCP Server - Enterprise Test Suite
+=======================================================
+Testing endpoint: http://localhost:8788/mcp
+Note: Tests validate tool availability, schema validation, and mathematical accuracy
+
+
+🏢 Testing Enterprise Project Tools...
+TAP version 13
+   Enterprise Project Tools: 0/3
+✅ Enterprise Projects Test: PASSED
+
+📋 Testing Enterprise Work Package Tools...
+# Subtest: Enterprise Projects - Tool Availability
+ok 1 - Enterprise Projects - Tool Availability
+  ---
+  duration_ms: 70.46248
+  type: 'test'
+  ...
+   Enterprise WP Tools: 3/3
+   Available: wp.createEnterprise, wp.updateEnterprise, wp.listEnterprise
+✅ Enterprise Work Packages Test: PASSED
+
+📊 Testing Enterprise Reporting Tools...
+# Subtest: Enterprise Work Packages - Tool Availability
+ok 2 - Enterprise Work Packages - Tool Availability
+  ---
+  duration_ms: 36.203261
+  type: 'test'
+  ...
+   Enterprise Reporting Tools: 5/5
+   Available: reports.earnedValue, reports.criticalPath, reports.projectDashboard, analytics.predictSuccess, analytics.benchmarkPerformance
+   ✅ Earned Value Management tool: Schema OK
+✅ Enterprise Reporting Test: PASSED
+
+⏱️  Testing Enterprise Time Tracking Tools...
+# Subtest: Enterprise Reporting - Tool Availability
+ok 3 - Enterprise Reporting - Tool Availability
+  ---
+  duration_ms: 35.698932
+  type: 'test'
+  ...
+   Enterprise Time Tools: 5/5
+   Available: time.logEnterprise, time.updateEnterprise, time.generateTimesheet, resources.allocate, resources.utilization
+✅ Enterprise Time Tracking Test: PASSED
+
+🏗️  Testing Program Management Tools...
+# Subtest: Enterprise Time Tracking - Tool Availability
+ok 4 - Enterprise Time Tracking - Tool Availability
+  ---
+  duration_ms: 17.264365
+  type: 'test'
+  ...
+   Program Management Tools: 4/4
+   Available: program.create, program.coordinateDeliveries, program.trackBenefits, program.manageStakeholders
+✅ Program Management Test: PASSED
+
+🛡️  Testing Enterprise Error Handling...
+# Subtest: Program Management - Tool Availability
+ok 5 - Program Management - Tool Availability
+  ---
+  duration_ms: 15.070598
+  type: 'test'
+  ...
+   ✅ Error format: -32602 - MCP error -32602: Tool projects.createEnterprise not found
+✅ Enterprise Error Handling Test: PASSED
+
+📊 Testing EVM Integration with Real Data...
+# Subtest: Enterprise Error Handling - Validation
+ok 6 - Enterprise Error Handling - Validation
+  ---
+  duration_ms: 8.102842
+  type: 'test'
+  ...
+⚠️  EVM Integration Test: SKIPPED (API not available)
+   Error: Should have EVM structure
+
+🔮 Testing Predictive Analytics Edge Cases...
+# Subtest: EVM Integration - Real API Calculations
+ok 7 - EVM Integration - Real API Calculations
+  ---
+  duration_ms: 259.580389
+  type: 'test'
+  ...
+   ✅ Success prediction: 49.5%
+✅ Predictive Analytics Edge Cases Test: PASSED
+
+💼 Testing Portfolio Management Mathematics...
+# Subtest: Predictive Analytics - Edge Cases
+ok 8 - Predictive Analytics - Edge Cases
+  ---
+  duration_ms: 323.189847
+  type: 'test'
+  ...
+   ✅ Strategic alignment: 0%
+   ✅ Risk assessment: high (0)
+   ✅ Resource utilization: low
+✅ Portfolio Management Mathematics Test: PASSED
+
+🔄 Testing Critical Path Analysis Implementation...
+# Subtest: Portfolio Management - Mathematical Validation
+ok 9 - Portfolio Management - Mathematical Validation
+  ---
+  duration_ms: 89.840902
+  type: 'test'
+  ...
+⚠️  Critical Path Analysis Implementation Test: SKIPPED
+   Error: Should have critical path analysis
+# Subtest: Critical Path Analysis - Real Implementation
+ok 10 - Critical Path Analysis - Real Implementation
+  ---
+  duration_ms: 266.590616
+  type: 'test'
+  ...
+1..10
+# tests 10
+# suites 0
+# pass 10
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1132.821022
+
+🧪 Running health.test.js...
+──────────────────────────────────────────────────
+
+🧪 OpenProject MCP Server - Basic Test Suite
+==================================================
+Testing endpoint: http://localhost:8788/mcp
+
+TAP version 13
+✅ Health Check Test: PASSED
+   Server Status: 200
+   Response: {
+  "type": "text",
+  "text": "{\n  \"status\": \"ok\",\n  \"statusCode\": 200,\n  \"instanceName\": \"OpenProject\",\n  \"version\": \"unknown\",\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3\"\n    },\n    \"configuration\": {\n      \"href\": \"/api/v3/configuration\"\n    },\n    \"memberships\": {\n      \"href\": \"/api/v3/memberships\"\n    },\n    \"priorities\": {\n      \"href\": \"/api/v3/priorities\"\n    },\n    \"relations\": {\n      \"href\": \"/api/v3/relations\"\n    },\n    \"statuses\": {\n      \"href\": \"/api/v3/statuses\"\n    },\n    \"time_entries\": {\n      \"href\": \"/api/v3/time_entries\"\n    },\n    \"types\": {\n      \"href\": \"/api/v3/types\"\n    },\n    \"user\": {\n      \"href\": \"/api/v3/users/4\",\n      \"title\": \"OpenProject Admin\"\n    },\n    \"userPreferences\": {\n      \"href\": \"/api/v3/users/4/preferences\"\n    },\n    \"workPackages\": {\n      \"href\": \"/api/v3/work_packages\"\n    }\n  }\n}"
+}
+# Subtest: MCP Server - Health Check
+ok 1 - MCP Server - Health Check
+  ---
+  duration_ms: 76.169268
+  type: 'test'
+  ...
+✅ Tools List Test: PASSED
+   Total Tools: 89
+   Core Tools Verified: op.health, projects.list, wp.list, wp.create
+# Subtest: MCP Server - Tools List
+ok 2 - MCP Server - Tools List
+  ---
+  duration_ms: 17.993029
+  type: 'test'
+  ...
+✅ Projects List Test: PASSED
+   Response Type: object
+# Subtest: OpenProject API - Projects List
+ok 3 - OpenProject API - Projects List
+  ---
+  duration_ms: 28.078425
+  type: 'test'
+  ...
+✅ Protocol Compliance Test: PASSED
+   Error Code: -32601
+   Error Message: Method not found
+# Subtest: MCP Protocol - Invalid Method
+ok 4 - MCP Protocol - Invalid Method
+  ---
+  duration_ms: 7.426205
+  type: 'test'
+  ...
+✅ Startup Detection Test: PASSED
+   Server Status: 405 Method Not Allowed
+# Subtest: MCP Server - Startup Detection
+ok 5 - MCP Server - Startup Detection
+  ---
+  duration_ms: 5.217561
+  type: 'test'
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 5
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 152.351917
+
+🧪 Running hybrid-system.test.js...
+──────────────────────────────────────────────────
+🚀 OpenProject MCP v3.0.0 - Hybrid System Integration Tests
+================================================================================
+
+📋 Test Configuration:
+   Base URL: https://thisistheway.local
+   Test Project ID: 1
+   Test User ID: 1
+   API Key: [CONFIGURED]
+
+⚠️  WARNING: No real API key provided. Some tests may fail.
+   Set OP_API_KEY environment variable for full testing.
+
+🧪 Running Integration Tests...
+
+
+🧪 Running: 1. Native Data Extraction
+❌ FAILED: 1. Native Data Extraction
+   Error: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/util/op' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/native-extractor.ts
+
+🧪 Running: 2. PMO Variable Management
+❌ FAILED: 2. PMO Variable Management
+   Error: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/util/op' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/variable-manager.ts
+
+🧪 Running: 3. Custom Enterprise Calculations
+❌ FAILED: 3. Custom Enterprise Calculations
+   Error: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/util/op' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/native-extractor.ts
+
+🧪 Running: 4. Hybrid Data Manager Integration
+❌ FAILED: 4. Hybrid Data Manager Integration
+   Error: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/native-extractor.js' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/hybrid-manager.ts
+
+🧪 Running: 5. Caching System Performance
+❌ FAILED: 5. Caching System Performance
+   Error: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/native-extractor.js' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/hybrid-manager.ts
+
+🧪 Running: 6. Portfolio Analytics
+❌ FAILED: 6. Portfolio Analytics
+   Error: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/native-extractor.js' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/hybrid-manager.ts
+
+🧪 Running: 7. Error Handling and Edge Cases
+❌ FAILED: 7. Error Handling and Edge Cases
+   Error: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/native-extractor.js' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/hybrid-manager.ts
+
+================================================================================
+📊 Test Results Summary
+================================================================================
+✅ Passed: 0
+❌ Failed: 7
+⏭️  Skipped: 0
+🎯 Success Rate: 0%
+
+❌ Failed Tests:
+   1. 1. Native Data Extraction: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/util/op' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/native-extractor.ts
+   2. 2. PMO Variable Management: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/util/op' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/variable-manager.ts
+   3. 3. Custom Enterprise Calculations: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/util/op' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/native-extractor.ts
+   4. 4. Hybrid Data Manager Integration: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/native-extractor.js' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/hybrid-manager.ts
+   5. 5. Caching System Performance: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/native-extractor.js' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/hybrid-manager.ts
+   6. 6. Portfolio Analytics: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/native-extractor.js' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/hybrid-manager.ts
+   7. 7. Error Handling and Edge Cases: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/native-extractor.js' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/hybrid-manager.ts
+
+🏁 Testing completed in 178ms
+
+🧪 Running hybrid-tools.test.js...
+──────────────────────────────────────────────────
+🔧 OpenProject MCP v3.0.0 - Hybrid MCP Tools Tests
+================================================================================
+
+📋 Test Configuration:
+   Base URL: https://thisistheway.local
+   Test Project ID: 1
+   Test Project IDs: 1, 2
+   Test User ID: 1
+   API Key: [CONFIGURED]
+
+🧰 New Hybrid Tools to Test:
+   📊 Hybrid Data: getProjectData, getProjectStatus, getMultipleProjectsData
+   📈 Portfolio: getPortfolioAnalytics
+   🔧 Variables: getProjectVariables, setProjectVariables, getOrganizationalDefaults, setOrganizationalDefaults, getUserVariables, export
+   🗄️  Cache: getPerformance, clearProject, warm
+   📊 Analytics: evmWithBenchmark
+   🏥 System: getHealth
+
+⚠️  WARNING: No real API key provided. Tool tests will have limited functionality.
+   Set OP_API_KEY environment variable for complete tool testing.
+
+🧪 Running Hybrid MCP Tools Tests...
+
+
+🧪 Running: 1. Hybrid Project Data Tools
+   📊 Testing hybrid project data tools...
+❌ FAILED: 1. Hybrid Project Data Tools
+   Error: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/hybrid-manager' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/tools/hybridTools.ts
+
+🧪 Running: 2. Portfolio Analytics Tools
+   📈 Testing portfolio analytics tools...
+❌ FAILED: 2. Portfolio Analytics Tools
+   Error: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/hybrid-manager' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/tools/hybridTools.ts
+
+🧪 Running: 3. PMO Variable Management Tools
+   🔧 Testing PMO variable management tools...
+❌ FAILED: 3. PMO Variable Management Tools
+   Error: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/hybrid-manager' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/tools/hybridTools.ts
+
+🧪 Running: 4. Cache Management Tools
+   🗄️  Testing cache management tools...
+❌ FAILED: 4. Cache Management Tools
+   Error: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/hybrid-manager' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/tools/hybridTools.ts
+
+🧪 Running: 5. Enhanced Analytics Tools
+   📊 Testing enhanced analytics tools...
+❌ FAILED: 5. Enhanced Analytics Tools
+   Error: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/hybrid-manager' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/tools/hybridTools.ts
+
+🧪 Running: 6. System Health Tools
+   🏥 Testing system health tools...
+❌ FAILED: 6. System Health Tools
+   Error: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/hybrid-manager' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/tools/hybridTools.ts
+
+🧪 Running: 7. Tool Integration and Data Flow
+   🔄 Testing tool integration and data flow...
+         ⚠️  Skipping integration tests - missing prerequisite tool results
+✅ PASSED: 7. Tool Integration and Data Flow
+
+🧪 Running: 8. Error Handling and Edge Cases
+   🛡️  Testing error handling and edge cases...
+❌ FAILED: 8. Error Handling and Edge Cases
+   Error: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/hybrid-manager' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/tools/hybridTools.ts
+
+================================================================================
+📊 Hybrid MCP Tools Test Results
+================================================================================
+✅ Passed: 1
+❌ Failed: 7
+⏭️  Skipped: 0
+🎯 Success Rate: 13%
+
+🧰 Tool Category Results:
+   ❌ HybridData Tools
+   ❌ Portfolio Tools
+   ❌ Variables Tools
+   ❌ Cache Tools
+   ❌ Analytics Tools
+   ❌ System Tools
+   ✅ Integration Tools
+   ❌ ErrorHandling Tools
+
+🔧 Individual Tool Results:
+   📊 Total tools tested: 0
+
+🔄 Integration Test Results:
+   ✅ Data consistency: Verified
+   ✅ Cache integration: Working
+   ✅ Tool interoperability: Functional
+
+❌ Failed Tests:
+   1. 1. Hybrid Project Data Tools: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/hybrid-manager' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/tools/hybridTools.ts
+   2. 2. Portfolio Analytics Tools: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/hybrid-manager' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/tools/hybridTools.ts
+   3. 3. PMO Variable Management Tools: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/hybrid-manager' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/tools/hybridTools.ts
+   4. 4. Cache Management Tools: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/hybrid-manager' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/tools/hybridTools.ts
+   5. 5. Enhanced Analytics Tools: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/hybrid-manager' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/tools/hybridTools.ts
+   6. 6. System Health Tools: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/hybrid-manager' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/tools/hybridTools.ts
+   7. 8. Error Handling and Edge Cases: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/hybrid-manager' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/tools/hybridTools.ts
+
+🏁 Hybrid MCP tools testing completed
+💡 All 22 new v3.0.0 hybrid tools have some issues that need attention.
+
+🧪 Running integration.test.js...
+──────────────────────────────────────────────────
+
+🔧 OpenProject MCP Server - Integration Test Suite
+=======================================================
+Testing endpoint: http://localhost:8788/mcp
+Note: Some tests require valid OP_BASE_URL and OP_TOKEN
+
+
+📋 Testing Complete PM Workflow...
+  1. Health Check...
+TAP version 13
+  2. List Projects...
+  3. List WP Types...
+  4. List Work Packages...
+  5. List Users...
+✅ Integration Test: PASSED
+   All workflow steps completed successfully
+
+🏢 Testing Enterprise Tools Availability...
+# Subtest: Integration - Complete PM Workflow
+ok 1 - Integration - Complete PM Workflow
+  ---
+  duration_ms: 374.785351
+  type: 'test'
+  ...
+   Available Enterprise Tools: 5/6
+   ✅ Enterprise features detected
+   Available: wp.createEnterprise, time.logEnterprise, reports.earnedValue, reports.criticalPath, dependencies.analyze
+   ⚠️  Missing: projects.createEnterprise
+✅ Enterprise Tools Check: PASSED
+   Total Tools: 89
+
+🛡️  Testing Error Handling...
+# Subtest: Enterprise Tools - Availability Check
+ok 2 - Enterprise Tools - Availability Check
+  ---
+  duration_ms: 18.869149
+  type: 'test'
+  ...
+✅ Error Handling Test: PASSED
+   All error scenarios handled correctly
+
+⚡ Testing Performance...
+# Subtest: Error Handling - Consistency Check
+ok 3 - Error Handling - Consistency Check
+  ---
+  duration_ms: 37.105916
+  type: 'test'
+  ...
+   Health Check: 21ms
+   Tools List: 18ms
+✅ Performance Test: PASSED
+   All responses within acceptable limits
+# Subtest: Performance - Response Times
+ok 4 - Performance - Response Times
+  ---
+  duration_ms: 41.092833
+  type: 'test'
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 4
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 488.354801
+
+🧪 Running live-validation.test.js...
+──────────────────────────────────────────────────
+--- Live Validation Start ---
+Capabilities: 3.2.0 tools: undefined
+Projects returned: 2 meta total: 2
+
+Project 2 - Scrum project
+Hybrid data keys: [ 'native', 'variables', 'calculations' ]
+Variables snapshot: laborRate= 75 evmMethod= traditional
+EVM CPI/SPI: 1 1 EAC: 0
+
+Project 1 - Demo project
+Hybrid data keys: [ 'native', 'variables', 'calculations' ]
+Variables snapshot: laborRate= 75 evmMethod= traditional
+EVM CPI/SPI: 1 1 EAC: 0
+Metrics tool call counters (sample): [
+  'tool_calls_total|reports.earnedValue|success',
+  'tool_calls_total|analytics.predictSuccess|success',
+  'tool_calls_total|analytics.predictSuccess|error',
+  'tool_calls_total|portfolio.generateHealthDashboard|success',
+  'tool_calls_total|reports.criticalPath|success'
+]
+
+All validations completed successfully.
+
+🧪 Running v3-comprehensive.test.js...
+──────────────────────────────────────────────────
+🚀 OpenProject MCP v3.0.0 - Comprehensive Test Suite
+Started at: 2025-08-30T17:56:43.422Z
+====================================================================================================
+📋 Environment Validation:
+   Base URL: https://thisistheway.local
+   API Key: [CONFIGURED]
+   Test Project ID: 1
+   Test User ID: 1
+   Integration Tests: ENABLED
+   Verbose Mode: OFF
+
+⚠️  Environment Warnings:
+   1. No real API key provided - tests will have limited functionality
+   2. Using default base URL - ensure OpenProject is accessible
+
+🧪 Running 4 test suites sequentially...
+
+
+================================================================================
+🧪 Running Test Suite: Hybrid System Integration
+================================================================================
+🚀 OpenProject MCP v3.0.0 - Hybrid System Integration Tests
+================================================================================
+
+📋 Test Configuration:
+   Base URL: https://thisistheway.local
+   Test Project ID: 1
+   Test User ID: 1
+   API Key: [CONFIGURED]
+
+⚠️  WARNING: No real API key provided. Some tests may fail.
+   Set OP_API_KEY environment variable for full testing.
+
+🧪 Running Integration Tests...
+
+
+🧪 Running: 1. Native Data Extraction
+❌ FAILED: 1. Native Data Extraction
+   Error: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/util/op' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/native-extractor.ts
+
+🧪 Running: 2. PMO Variable Management
+❌ FAILED: 2. PMO Variable Management
+   Error: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/util/op' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/variable-manager.ts
+
+🧪 Running: 3. Custom Enterprise Calculations
+❌ FAILED: 3. Custom Enterprise Calculations
+   Error: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/util/op' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/native-extractor.ts
+
+🧪 Running: 4. Hybrid Data Manager Integration
+❌ FAILED: 4. Hybrid Data Manager Integration
+   Error: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/native-extractor.js' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/hybrid-manager.ts
+
+🧪 Running: 5. Caching System Performance
+❌ FAILED: 5. Caching System Performance
+   Error: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/native-extractor.js' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/hybrid-manager.ts
+
+🧪 Running: 6. Portfolio Analytics
+❌ FAILED: 6. Portfolio Analytics
+   Error: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/native-extractor.js' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/hybrid-manager.ts
+
+🧪 Running: 7. Error Handling and Edge Cases
+❌ FAILED: 7. Error Handling and Edge Cases
+   Error: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/native-extractor.js' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/hybrid-manager.ts
+
+================================================================================
+📊 Test Results Summary
+================================================================================
+✅ Passed: 0
+❌ Failed: 7
+⏭️  Skipped: 0
+🎯 Success Rate: 0%
+
+❌ Failed Tests:
+   1. 1. Native Data Extraction: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/util/op' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/native-extractor.ts
+   2. 2. PMO Variable Management: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/util/op' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/variable-manager.ts
+   3. 3. Custom Enterprise Calculations: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/util/op' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/native-extractor.ts
+   4. 4. Hybrid Data Manager Integration: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/native-extractor.js' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/hybrid-manager.ts
+   5. 5. Caching System Performance: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/native-extractor.js' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/hybrid-manager.ts
+   6. 6. Portfolio Analytics: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/native-extractor.js' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/hybrid-manager.ts
+   7. 7. Error Handling and Edge Cases: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/native-extractor.js' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/hybrid-manager.ts
+
+🏁 Testing completed in 160ms
+
+🧪 Running variable-management.test.js...
+──────────────────────────────────────────────────
+🔧 OpenProject MCP v3.0.0 - PMO Variable Management Tests
+================================================================================
+
+📋 Test Configuration:
+   Base URL: https://thisistheway.local
+   Test Project ID: 1
+   Test User ID: 1
+   API Key: [CONFIGURED]
+
+🏢 Organizational Defaults (from env):
+   Labor Rate: $85/hour
+   Utilization: 0.80
+   Risk Tolerance: medium
+
+⚠️  WARNING: No real API key provided. Some tests may fail or be limited.
+   Set OP_API_KEY environment variable for full testing.
+
+🧪 Running Variable Management Tests...
+
+
+🧪 Running: 1. Default Variables Loading
+❌ FAILED: 1. Default Variables Loading
+   Error: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/util/op' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/variable-manager.ts
+
+🧪 Running: 2. Variable Validation System
+❌ FAILED: 2. Variable Validation System
+   Error: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/util/op' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/variable-manager.ts
+
+🧪 Running: 3. User-Specific Variables
+❌ FAILED: 3. User-Specific Variables
+   Error: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/util/op' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/variable-manager.ts
+
+🧪 Running: 4. Multiple Project Variables
+❌ FAILED: 4. Multiple Project Variables
+   Error: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/util/op' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/variable-manager.ts
+
+🧪 Running: 5. Variable Export Functionality
+❌ FAILED: 5. Variable Export Functionality
+   Error: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/util/op' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/variable-manager.ts
+
+🧪 Running: 6. Variable Persistence Simulation
+❌ FAILED: 6. Variable Persistence Simulation
+   Error: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/util/op' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/variable-manager.ts
+
+🧪 Running: 7. Variable History and Audit
+❌ FAILED: 7. Variable History and Audit
+   Error: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/util/op' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/variable-manager.ts
+
+🧪 Running: 8. PMO Custom Fields Management
+❌ FAILED: 8. PMO Custom Fields Management
+   Error: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/util/op' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/variable-manager.ts
+
+================================================================================
+📊 Variable Management Test Results
+================================================================================
+✅ Passed: 0
+❌ Failed: 8
+⏭️  Skipped: 0
+🎯 Success Rate: 0%
+
+❌ Failed Tests:
+   1. 1. Default Variables Loading: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/util/op' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/variable-manager.ts
+   2. 2. Variable Validation System: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/util/op' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/variable-manager.ts
+   3. 3. User-Specific Variables: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/util/op' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/variable-manager.ts
+   4. 4. Multiple Project Variables: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/util/op' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/variable-manager.ts
+   5. 5. Variable Export Functionality: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/util/op' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/variable-manager.ts
+   6. 6. Variable Persistence Simulation: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/util/op' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/variable-manager.ts
+   7. 7. Variable History and Audit: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/util/op' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/variable-manager.ts
+   8. 8. PMO Custom Fields Management: Cannot find module '/mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/util/op' imported from /mnt/c/Users/AdamSandoval/dev/openproject-mcp/src/data/variable-manager.ts
+
+🏁 Variable management testing completed
+
+📊 Test Summary
+============================================================
+Total Tests: 11
+Passed: 8 ✅
+Failed: 3 ❌
+Duration: 9891ms
+
+❌ Failed Tests:
+   - cache-performance.test.js (exit code: 1)
+   - hybrid-system.test.js (exit code: 1)
+   - v3-comprehensive.test.js (exit code: 1)
+
+⚠️  Some tests failed
+
+🔧 Environment Info:
+   Node.js: v22.18.0
+   Platform: linux
+   MCP Endpoint: http://localhost:8788/mcp

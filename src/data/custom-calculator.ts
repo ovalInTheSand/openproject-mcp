@@ -41,7 +41,7 @@ export class CustomPMCalculator {
     
     // Calculate Earned Value (EV) from OpenProject's native percentageDone
   let earnedValue = this.calculateEarnedValue(nativeData, budgetAtCompletion);
-  if (earnedValue == null || !Number.isFinite(earnedValue)) earnedValue = 0;
+  if (earnedValue == null || !Number.isFinite(earnedValue)) {earnedValue = 0;}
     
     // Calculate Actual Cost (AC) from time entries and rates
     const actualCost = this.calculateActualCost(nativeData.timeEntries, variables);
@@ -119,7 +119,7 @@ export class CustomPMCalculator {
     const totalDuration = projectEnd.getTime() - projectStart.getTime();
     const elapsedDuration = Math.max(0, asOfDate.getTime() - projectStart.getTime());
     
-    if (totalDuration <= 0) return 0;
+    if (totalDuration <= 0) {return 0;}
     
     // Calculate planned progress based on time elapsed
     const timeProgress = Math.min(1, elapsedDuration / totalDuration);
@@ -141,7 +141,7 @@ export class CustomPMCalculator {
       totalEarnedValue += wpEarnedValue;
     });
     
-  if (totalEarnedValue == null || !Number.isFinite(totalEarnedValue)) return 0;
+  if (totalEarnedValue == null || !Number.isFinite(totalEarnedValue)) {return 0;}
   return totalEarnedValue;
   }
   
@@ -377,9 +377,9 @@ export class CustomPMCalculator {
   // Helper methods
   
   private parseISO8601Duration(duration?: string): number {
-    if (!duration) return 0;
+    if (!duration) {return 0;}
     const match = duration.match(/^PT(?:(\d+(?:\.\d+)?)H)?(?:(\d+(?:\.\d+)?)D)?$/);
-    if (!match) return 0;
+    if (!match) {return 0;}
     const hours = parseFloat(match[1] || '0');
     const days = parseFloat(match[2] || '0');
     return hours + (days * 8);
@@ -406,7 +406,7 @@ export class CustomPMCalculator {
     const visited = new Set<string>();
     
     const calculateEarly = (nodeId: string): void => {
-      if (visited.has(nodeId)) return;
+      if (visited.has(nodeId)) {return;}
       visited.add(nodeId);
       
       const node = nodes.get(nodeId)!;
@@ -429,7 +429,7 @@ export class CustomPMCalculator {
     const visited = new Set<string>();
     
     const calculateLate = (nodeId: string): void => {
-      if (visited.has(nodeId)) return;
+      if (visited.has(nodeId)) {return;}
       visited.add(nodeId);
       
       const node = nodes.get(nodeId)!;
@@ -461,22 +461,22 @@ export class CustomPMCalculator {
     const threshold = variables.costPerformanceThreshold;
     const scheduleThreshold = variables.schedulePerformanceThreshold;
     
-    if (cpi >= threshold && spi >= scheduleThreshold) return 'Green';
-    if (cpi >= threshold * 0.85 && spi >= scheduleThreshold * 0.85) return 'Yellow';
+    if (cpi >= threshold && spi >= scheduleThreshold) {return 'Green';}
+    if (cpi >= threshold * 0.85 && spi >= scheduleThreshold * 0.85) {return 'Yellow';}
     return 'Red';
   }
   
   private determineCostStatus(cpi: number, threshold: number): EVMCalculation['costStatus'] {
     // Normalize threshold around 1.0 PMI baseline
-    if (cpi >= 1.0) return 'Under Budget';
-    if (cpi >= threshold) return 'Over Budget';
+    if (cpi >= 1.0) {return 'Under Budget';}
+    if (cpi >= threshold) {return 'Over Budget';}
     return 'Seriously Over Budget';
   }
   
   private determineScheduleStatus(spi: number, threshold: number): EVMCalculation['scheduleStatus'] {
-    if (spi >= 1.05) return 'Ahead';
-    if (spi >= threshold) return 'On Track';
-    if (spi >= threshold * 0.9) return 'Behind';
+    if (spi >= 1.05) {return 'Ahead';}
+    if (spi >= threshold) {return 'On Track';}
+    if (spi >= threshold * 0.9) {return 'Behind';}
     return 'Seriously Behind';
   }
   
@@ -485,21 +485,21 @@ export class CustomPMCalculator {
     let confidence = 0.5; // Base confidence
     
     // Increase confidence for more data points
-    if (nativeData.workPackages.length > 0) confidence += 0.1;
-    if (nativeData.timeEntries.length > 10) confidence += 0.1;
-    if (nativeData.totalEstimatedHours > 0) confidence += 0.1;
+    if (nativeData.workPackages.length > 0) {confidence += 0.1;}
+    if (nativeData.timeEntries.length > 10) {confidence += 0.1;}
+    if (nativeData.totalEstimatedHours > 0) {confidence += 0.1;}
     
     // Increase confidence for project maturity
-    if (nativeData.overallPercentComplete > 25) confidence += 0.1;
-    if (nativeData.overallPercentComplete > 50) confidence += 0.1;
+    if (nativeData.overallPercentComplete > 25) {confidence += 0.1;}
+    if (nativeData.overallPercentComplete > 50) {confidence += 0.1;}
     
     return Math.min(1.0, confidence);
   }
   
   private getRiskAdjustment(performanceIndex: number): number {
     // Adjust forecasts based on current performance
-    if (performanceIndex > 1.1) return 1.05; // Good performance, slight optimism
-    if (performanceIndex < 0.8) return 0.9;  // Poor performance, add pessimism
+    if (performanceIndex > 1.1) {return 1.05;} // Good performance, slight optimism
+    if (performanceIndex < 0.8) {return 0.9;}  // Poor performance, add pessimism
     return 1.0; // Normal performance
   }
   
@@ -512,8 +512,8 @@ export class CustomPMCalculator {
       node => node.isCritical && node.percentComplete < 50
     ).length;
     
-    if (behindScheduleNodes === 0 && averageCriticalProgress > 75) return 'Low';
-    if (behindScheduleNodes <= 2 && averageCriticalProgress > 50) return 'Medium';
+    if (behindScheduleNodes === 0 && averageCriticalProgress > 75) {return 'Low';}
+    if (behindScheduleNodes <= 2 && averageCriticalProgress > 50) {return 'Medium';}
     return 'High';
   }
   

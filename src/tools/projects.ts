@@ -65,8 +65,8 @@ export async function createProject({ env }: Ctx, input: z.infer<typeof createPr
   };
 
   // Add optional enterprise fields
-  if (input.description) payload.description = input.description;
-  if (input.statusExplanation) payload.statusExplanation = input.statusExplanation;
+  if (input.description) {payload.description = input.description;}
+  if (input.statusExplanation) {payload.statusExplanation = input.statusExplanation;}
   
   // Project hierarchy support
   if (input.parentId) {
@@ -107,7 +107,7 @@ export async function createProject({ env }: Ctx, input: z.infer<typeof createPr
 
   // Commit project creation
   const commit = form?._links?.commit;
-  if (!commit?.href) throw new Error("Form commit link missing - insufficient permissions");
+  if (!commit?.href) {throw new Error("Form commit link missing - insufficient permissions");}
   
   const { json: created } = await opFetch<any>(env, commit.href, {
     method: commit.method || "POST",
@@ -154,11 +154,11 @@ export async function updateProject({ env }: Ctx, input: z.infer<typeof updatePr
   };
 
   // Update core fields
-  if (input.name !== undefined) payload.name = input.name;
-  if (input.description !== undefined) payload.description = input.description;
-  if (input.active !== undefined) payload.active = input.active;
-  if (input.public !== undefined) payload.public = input.public;
-  if (input.statusExplanation !== undefined) payload.statusExplanation = input.statusExplanation;
+  if (input.name !== undefined) {payload.name = input.name;}
+  if (input.description !== undefined) {payload.description = input.description;}
+  if (input.active !== undefined) {payload.active = input.active;}
+  if (input.public !== undefined) {payload.public = input.public;}
+  if (input.statusExplanation !== undefined) {payload.statusExplanation = input.statusExplanation;}
 
   // Update hierarchy
   payload._links = current._links || {};
@@ -199,7 +199,7 @@ export async function updateProject({ env }: Ctx, input: z.infer<typeof updatePr
 
   // Commit update
   const commit = form?._links?.commit;
-  if (!commit?.href) throw new Error("Form commit link missing");
+  if (!commit?.href) {throw new Error("Form commit link missing");}
   
   const { json: updated } = await opFetch<any>(env, commit.href, {
     method: commit.method || "PATCH",

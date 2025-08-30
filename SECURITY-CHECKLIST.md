@@ -162,9 +162,20 @@ The server implements multiple layers of runtime security. Verify these are conf
 ### Retry Semantics
 - 429 includes `Retry-After` header for client backoff orchestration.
 
+### Additional Runtime Controls (v3.2.x Additions)
+- HMAC signature enforcement (SHA-256) with timestamp + nonce replay prevention (nonce cache, skew window default 180s)
+- Weak secret detection (reject <32 char secret as 'weak_secret')
+- Prototype pollution guard (blocks keys: __proto__, constructor, prototype)
+- Structured error redaction (auth/token/secret/password fields masked)
+- AbortController-based per-tool execution cancellation (hard timeout + fetch abort)
+- HTTPS enforcement: non-HTTPS OP_BASE_URL requires OP_ALLOW_INSECURE_HTTP=true
+- RBAC scope gating: MCP_TOOL_SCOPES JSON env + client header x-mcp-scopes
+- Input size guards (arrays, strings, depth, filters) returning 422 validation_error
+- HMAC failure & scope denial metrics (exposed via system.getMetrics)
+
 ### Open Issues / Next Steps
-- Optional HMAC signature for higher-integrity S2S flows.
-- IP hashing (salted) for privacy-preserving analytics.
-- Centralized distributed rate limit store if multi-instance scaling required.
+- IP hashing (salted) already implemented; consider rotating salt periodically.
+- Distributed rate limit + nonce store for multi-instance scaling.
+- Optional persistent metrics export (Prometheus scrape or push).
 
 ---

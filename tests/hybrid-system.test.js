@@ -370,10 +370,24 @@ async function runAllTests() {
   
   console.log(`\n🧪 Running Integration Tests...\n`);
   
-  await runTest('1. Native Data Extraction', testNativeDataExtraction);
+  await runTest('1. Native Data Extraction', async () => {
+    // Ensure offline stub active when using test token
+    if (TEST_CONFIG.apiKey === 'test-api-key') {
+      const startNet = Date.now();
+      await testNativeDataExtraction();
+      const duration = Date.now() - startNet;
+      assert(duration < 2000, 'Offline stub extraction should be fast (<2s)');
+    } else {
+      await testNativeDataExtraction();
+    }
+  });
   await runTest('2. PMO Variable Management', testPMOVariableManagement);
   await runTest('3. Custom Enterprise Calculations', testCustomEnterpriseCalculations);
-  await runTest('4. Hybrid Data Manager Integration', testHybridDataManagerIntegration);
+  await runTest('4. Hybrid Data Manager Integration', async () => {
+    await testHybridDataManagerIntegration();
+    // Sanity check: hybrid data should not mutate offline stub host
+    assert(TEST_CONFIG.baseUrl.includes('thisistheway') || TEST_CONFIG.apiKey !== 'test-api-key', 'Unexpected base URL during offline test');
+  });
   await runTest('5. Caching System Performance', testCachingSystemPerformance);
   await runTest('6. Portfolio Analytics', testPortfolioAnalytics);
   await runTest('7. Error Handling and Edge Cases', testErrorHandlingAndEdgeCases);

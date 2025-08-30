@@ -151,8 +151,9 @@ export class HybridDataManager {
       endDate
     );
     
-    await cacheManager.cacheResourceUtilization(String(projectId), utilization);
-    return utilization;
+  const stamped = utilization.map(u => ({ ...u, _cachedAt: new Date().toISOString() }));
+  await cacheManager.cacheResourceUtilization(String(projectId), stamped as any);
+  return stamped as any;
   }
   
   /**
@@ -191,7 +192,8 @@ export class HybridDataManager {
     }[];
     recommendations: string[];
   }> {
-    const cacheKey = `portfolio_${projectIds.join('_')}`;
+  // Normalize order so same set yields same key
+  const cacheKey = `portfolio_${[...projectIds].map(String).sort().join('_')}`;
     const cached = await cacheManager.get<any>('portfolioAnalytics', cacheKey);
     
     if (cached) {
@@ -348,10 +350,10 @@ export class HybridDataManager {
     const daysSinceCalculation = (Date.now() - cachedDate.getTime()) / (1000 * 60 * 60 * 24);
     
     // Always recalculate if more than 1 day old
-    if (daysSinceCalculation > 1) return true;
+    if (daysSinceCalculation > 1) {return true;}
     
     // Recalculate if project has significant progress (>5% change expected)
-    if (nativeData.overallPercentComplete > 80 && daysSinceCalculation > 0.5) return true;
+    if (nativeData.overallPercentComplete > 80 && daysSinceCalculation > 0.5) {return true;}
     
     return false;
   }
@@ -365,8 +367,12 @@ export class HybridDataManager {
   }
   
   private shouldRecalculateResources(cached: ResourceUtilization[], nativeData: NativeProjectMetrics): boolean {
-    // Resource utilization should be recalculated daily
-    return true; // For now, always recalculate for fresh data
+  if (!cached.length) {return true;}
+  const first: any = cached[0];
+  const ts = first && first._cachedAt ? Date.parse(first._cachedAt) : 0;
+  if (!ts || Number.isNaN(ts)) {return true;}
+  const ageHours = (Date.now() - ts) / 3600000;
+  return ageHours > 24; // daily refresh policy
   }
   
   private async getWorkPackageDependencies(
@@ -382,8 +388,8 @@ export class HybridDataManager {
     const workPackageCount = nativeData.workPackages.length;
     const timeEntryCount = nativeData.timeEntries.length;
     
-    if (workPackageCount < 20 && timeEntryCount < 100) return 'low';
-    if (workPackageCount < 100 && timeEntryCount < 500) return 'medium';
+    if (workPackageCount < 20 && timeEntryCount < 100) {return 'low';}
+    if (workPackageCount < 100 && timeEntryCount < 500) {return 'medium';}
     return 'high';
   }
   
@@ -398,10 +404,10 @@ export class HybridDataManager {
     allResourceUtilization.forEach(resource => {
       if (resource.overallocation) {
         const projects = resource.projects.map(p => p.projectName);
-        userProjects.set(String(resource.userId), projects);
-        
+        const userId = String(resource.userId);
+        userProjects.set(userId, projects);
         conflicts.push({
-          userId: resource.userId,
+          userId,
           overallocation: resource.utilizationRate,
           projects
         });
@@ -423,8 +429,8 @@ export class HybridDataManager {
     const redRatio = healthCounts.Red / totalProjects;
     const greenRatio = healthCounts.Green / totalProjects;
     
-    if (redRatio > 0.3) return 'Red';
-    if (greenRatio < 0.5) return 'Yellow';
+    if (redRatio > 0.3) {return 'Red';}
+    if (greenRatio < 0.5) {return 'Yellow';}
     return 'Green';
   }
   

@@ -180,12 +180,12 @@ export async function updateWebhook({ env }: Ctx, input: z.infer<typeof updateWe
     // Build update payload with only provided fields
     const payload: any = {};
     
-    if (input.name !== undefined) payload.name = input.name;
-    if (input.url !== undefined) payload.url = input.url;
-    if (input.events !== undefined) payload.events = input.events;
-    if (input.enabled !== undefined) payload.enabled = input.enabled;
-    if (input.secret !== undefined) payload.secret = input.secret;
-    if (input.description !== undefined) payload.description = input.description;
+    if (input.name !== undefined) {payload.name = input.name;}
+    if (input.url !== undefined) {payload.url = input.url;}
+    if (input.events !== undefined) {payload.events = input.events;}
+    if (input.enabled !== undefined) {payload.enabled = input.enabled;}
+    if (input.secret !== undefined) {payload.secret = input.secret;}
+    if (input.description !== undefined) {payload.description = input.description;}
     if (input.projects !== undefined) {
       payload.projects = input.projects.map(id => ({ id: String(id) }));
     }

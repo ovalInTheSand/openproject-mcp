@@ -99,9 +99,9 @@ export async function createMilestoneEnterprise({ env }: Ctx, input: z.infer<typ
   };
 
   // Add optional core fields
-  if (input.description) payload.description = input.description;
-  if (input.startDate) payload.startDate = input.startDate;
-  if (input.endDate) payload.endDate = input.endDate;
+  if (input.description) {payload.description = input.description;}
+  if (input.startDate) {payload.startDate = input.startDate;}
+  if (input.endDate) {payload.endDate = input.endDate;}
 
   // Enterprise milestone metadata
   const enterpriseMetadata = {
@@ -127,7 +127,7 @@ export async function createMilestoneEnterprise({ env }: Ctx, input: z.infer<typ
   payload.customField1 = JSON.stringify(enterpriseMetadata);
 
   // Stakeholder assignments
-  if (input.responsibleId) payload._links.responsible = hal.user(input.responsibleId);
+  if (input.responsibleId) {payload._links.responsible = hal.user(input.responsibleId);}
   
   // Store approvers and stakeholders in description if no dedicated fields
   if (input.approverIds || input.stakeholderIds) {
@@ -202,12 +202,12 @@ export async function updateMilestoneEnterprise({ env }: Ctx, input: z.infer<typ
   const payload: any = {};
 
   // Update core fields
-  if (input.name !== undefined) payload.name = input.name;
-  if (input.description !== undefined) payload.description = input.description;
-  if (input.startDate !== undefined) payload.startDate = input.startDate;
-  if (input.endDate !== undefined) payload.endDate = input.endDate;
-  if (input.status !== undefined) payload.status = input.status;
-  if (input.sharing !== undefined) payload.sharing = input.sharing;
+  if (input.name !== undefined) {payload.name = input.name;}
+  if (input.description !== undefined) {payload.description = input.description;}
+  if (input.startDate !== undefined) {payload.startDate = input.startDate;}
+  if (input.endDate !== undefined) {payload.endDate = input.endDate;}
+  if (input.status !== undefined) {payload.status = input.status;}
+  if (input.sharing !== undefined) {payload.sharing = input.sharing;}
 
   // Update enterprise metadata
   let enterpriseMetadata: any = {};
@@ -218,12 +218,12 @@ export async function updateMilestoneEnterprise({ env }: Ctx, input: z.infer<typ
   }
 
   // Update enterprise fields
-  if (input.milestoneType !== undefined) enterpriseMetadata.milestoneType = input.milestoneType;
-  if (input.criticalPath !== undefined) enterpriseMetadata.criticalPath = input.criticalPath;
-  if (input.approvalRequired !== undefined) enterpriseMetadata.approvalRequired = input.approvalRequired;
-  if (input.gateExitCriteria !== undefined) enterpriseMetadata.gateExitCriteria = input.gateExitCriteria;
-  if (input.qualityGateRequired !== undefined) enterpriseMetadata.qualityGateRequired = input.qualityGateRequired;
-  if (input.complianceCheckRequired !== undefined) enterpriseMetadata.complianceCheckRequired = input.complianceCheckRequired;
+  if (input.milestoneType !== undefined) {enterpriseMetadata.milestoneType = input.milestoneType;}
+  if (input.criticalPath !== undefined) {enterpriseMetadata.criticalPath = input.criticalPath;}
+  if (input.approvalRequired !== undefined) {enterpriseMetadata.approvalRequired = input.approvalRequired;}
+  if (input.gateExitCriteria !== undefined) {enterpriseMetadata.gateExitCriteria = input.gateExitCriteria;}
+  if (input.qualityGateRequired !== undefined) {enterpriseMetadata.qualityGateRequired = input.qualityGateRequired;}
+  if (input.complianceCheckRequired !== undefined) {enterpriseMetadata.complianceCheckRequired = input.complianceCheckRequired;}
 
   payload.customField1 = JSON.stringify(enterpriseMetadata);
 
@@ -435,8 +435,8 @@ export async function getMilestoneProgress({ env }: Ctx, input: z.infer<typeof g
     })
     .filter((milestone: any) => {
       // Apply enterprise filters
-      if (input.milestoneType && milestone.milestoneType !== input.milestoneType) return false;
-      if (input.criticalPathOnly && !milestone.criticalPath) return false;
+      if (input.milestoneType && milestone.milestoneType !== input.milestoneType) {return false;}
+      if (input.criticalPathOnly && !milestone.criticalPath) {return false;}
       return true;
     });
 

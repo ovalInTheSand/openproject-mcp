@@ -8,13 +8,7 @@ export default [
       'dist/**',
       '.wrangler/**',
       'node_modules/**',
-      '*.js',
-      '*.d.ts',
-      'src/tools/*Enterprise.ts',
-      'src/tools/portfolioManagement.ts',
-      'src/tools/riskManagement.ts',
-      'src/tools/predictiveAnalytics.ts',
-      'src/tools/programManagement.ts'
+  '*.d.ts'
     ]
   },
   {

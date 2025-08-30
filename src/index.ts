@@ -21,8 +21,8 @@ const app = new Hono<{ Bindings: Bindings }>();
 const corsConfig = {
   origin: (origin: string | undefined, c: any) => {
     const allow = c.env.ALLOWED_ORIGINS?.split(',').map((s: string) => s.trim()).filter(Boolean) ?? [];
-    if (!allow.length) return '';
-    if (!origin) return allow[0];
+    if (!allow.length) {return '';}
+    if (!origin) {return allow[0];}
     return allow.includes(origin) ? origin : '';
   },
   allowHeaders: ["Content-Type", "mcp-session-id", "Last-Event-ID", "Cache-Control", "x-mcp-auth"],

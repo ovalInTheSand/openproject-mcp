@@ -194,7 +194,7 @@ export async function listProjectsPortfolio(
   ctx: { env: any },
   input: z.infer<typeof listProjectsPortfolioInput>
 ) {
-  let queryParams: Record<string, any> = {
+  const queryParams: Record<string, any> = {
     pageSize: input.pageSize,
     offset: input.offset
   };

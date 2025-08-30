@@ -88,7 +88,7 @@ export async function handleSSEConnection(c: Context): Promise<Response> {
         lastEventId,
         isActive: true,
         send: (payload: string) => {
-          if (!controllerOpen) return false;
+          if (!controllerOpen) {return false;}
           try {
             controller.enqueue(encoder.encode(payload));
             return true;
@@ -134,7 +134,7 @@ export async function handleSSEConnection(c: Context): Promise<Response> {
             timestamp: new Date().toISOString()
           });
           
-          if (!connection.send(heartbeat)) cleanup();
+          if (!connection.send(heartbeat)) {cleanup();}
         } else {
           cleanup();
         }
@@ -175,7 +175,7 @@ export function broadcastSSEEvent(event: SSEEvent): void {
       connections.delete(connection.id);
       return;
     }
-    if (!eventMatchesFilters(event, connection.filters)) return;
+    if (!eventMatchesFilters(event, connection.filters)) {return;}
     const ok = connection.send(message);
     if (!ok) {
       connection.isActive = false;

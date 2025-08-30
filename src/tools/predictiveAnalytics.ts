@@ -522,12 +522,12 @@ function applyHeuristicModel(metrics: any, input: any): any {
   score -= metrics.overdueRate * 0.4;
   
   // Activity level factor (15% weight)
-  if (metrics.activityLevel > 2) score += 10;
-  else if (metrics.activityLevel < 0.5) score -= 15;
+  if (metrics.activityLevel > 2) {score += 10;}
+  else if (metrics.activityLevel < 0.5) {score -= 15;}
   
   // Team size factor (15% weight)
-  if (metrics.teamSize >= 3 && metrics.teamSize <= 8) score += 8;
-  else if (metrics.teamSize > 15) score -= 12;
+  if (metrics.teamSize >= 3 && metrics.teamSize <= 8) {score += 8;}
+  else if (metrics.teamSize > 15) {score -= 12;}
   
   // Health indicators (20% weight)
   const healthScore = Object.values(metrics.healthIndicators).filter(Boolean).length * 5;
@@ -844,10 +844,10 @@ function generateDetailedBenchmarkInsights(analysis: any, currentMetrics: any, b
 function calculateModelConfidence(metrics: any): number {
   let confidence = 70; // Base confidence
   
-  if (metrics.totalWorkPackages >= 10) confidence += 10;
-  if (metrics.projectAge >= 30) confidence += 10; 
-  if (metrics.teamSize >= 3) confidence += 5;
-  if (Object.values(metrics.healthIndicators).filter(Boolean).length >= 3) confidence += 5;
+  if (metrics.totalWorkPackages >= 10) {confidence += 10;}
+  if (metrics.projectAge >= 30) {confidence += 10;} 
+  if (metrics.teamSize >= 3) {confidence += 5;}
+  if (Object.values(metrics.healthIndicators).filter(Boolean).length >= 3) {confidence += 5;}
   
   return Math.min(95, confidence);
 }
@@ -855,11 +855,11 @@ function calculateModelConfidence(metrics: any): number {
 function extractPredictionFactors(metrics: any): string[] {
   const factors = [];
   
-  if (metrics.completionRate > 70) factors.push("Strong completion rate");
-  if (metrics.overdueRate < 15) factors.push("Good timeline adherence");
-  if (metrics.activityLevel > 2) factors.push("High team engagement");
-  if (metrics.teamSize >= 3 && metrics.teamSize <= 8) factors.push("Optimal team size");
-  if (metrics.changeFrequency < 2) factors.push("Stable scope");
+  if (metrics.completionRate > 70) {factors.push("Strong completion rate");}
+  if (metrics.overdueRate < 15) {factors.push("Good timeline adherence");}
+  if (metrics.activityLevel > 2) {factors.push("High team engagement");}
+  if (metrics.teamSize >= 3 && metrics.teamSize <= 8) {factors.push("Optimal team size");}
+  if (metrics.changeFrequency < 2) {factors.push("Stable scope");}
   
   return factors;
 }
@@ -893,9 +893,9 @@ function identifyKeyDecisionFactors(metrics: any): string[] {
 function calculateDataQuality(metrics: any): number {
   let quality = 0.5; // Base quality
   
-  if (metrics.totalWorkPackages >= 5) quality += 0.2;
-  if (metrics.projectAge >= 14) quality += 0.2;
-  if (metrics.teamSize >= 2) quality += 0.1;
+  if (metrics.totalWorkPackages >= 5) {quality += 0.2;}
+  if (metrics.projectAge >= 14) {quality += 0.2;}
+  if (metrics.teamSize >= 2) {quality += 0.1;}
   
   return Math.min(1, quality);
 }
@@ -929,7 +929,7 @@ function identifyCurrentIssues(workPackages: any[], health: string): string[] {
 
 function calculateOnTimeDeliveryRate(workPackages: any[]): number {
   const completedWPs = workPackages.filter(wp => wp.percentDone === 100);
-  if (completedWPs.length === 0) return 0;
+  if (completedWPs.length === 0) {return 0;}
   
   const onTimeWPs = completedWPs.filter(wp => 
     !wp.dueDate || new Date(wp.updatedAt || wp.createdAt) <= new Date(wp.dueDate)

@@ -73,10 +73,10 @@ export const createDependencyInput = z.object({
 
 // Helper function for negative lag validation and conversion
 function validateAndConvertLag(lag?: string): { isValid: boolean; days: number; type: 'lead' | 'lag' | 'none'; displayText: string } {
-  if (!lag) return { isValid: true, days: 0, type: 'none', displayText: 'No lead/lag' };
+  if (!lag) {return { isValid: true, days: 0, type: 'none', displayText: 'No lead/lag' };}
   
   const match = lag.match(/^(-?)P(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?$/);
-  if (!match) return { isValid: false, days: 0, type: 'none', displayText: 'Invalid format' };
+  if (!match) {return { isValid: false, days: 0, type: 'none', displayText: 'Invalid format' };}
   
   const [, sign, days = '0', hours = '0', minutes = '0', seconds = '0'] = match;
   const totalDays = parseInt(days) + (parseInt(hours) / 24) + (parseInt(minutes) / (24 * 60)) + (parseInt(seconds) / (24 * 60 * 60));
@@ -127,14 +127,14 @@ export async function createDependency({ env }: Ctx, input: z.infer<typeof creat
   
   // Add description combining all metadata with enhanced negative lag info
   const descriptionParts = [];
-  if (input.description) descriptionParts.push(input.description);
-  if (input.rationale) descriptionParts.push(`**Rationale**: ${input.rationale}`);
-  if (input.external) descriptionParts.push(`**External Dependency**: ${input.externalType || 'General'}`);
-  if (input.externalDescription) descriptionParts.push(`**External Details**: ${input.externalDescription}`);
-  if (input.riskLevel !== 'medium') descriptionParts.push(`**Risk Level**: ${input.riskLevel}`);
-  if (input.businessImpact !== 'moderate') descriptionParts.push(`**Business Impact**: ${input.businessImpact}`);
-  if (input.lag) descriptionParts.push(`**Timing**: ${lagValidation.displayText}`);
-  if (!input.mandatory) descriptionParts.push(`**Type**: Soft constraint`);
+  if (input.description) {descriptionParts.push(input.description);}
+  if (input.rationale) {descriptionParts.push(`**Rationale**: ${input.rationale}`);}
+  if (input.external) {descriptionParts.push(`**External Dependency**: ${input.externalType || 'General'}`);}
+  if (input.externalDescription) {descriptionParts.push(`**External Details**: ${input.externalDescription}`);}
+  if (input.riskLevel !== 'medium') {descriptionParts.push(`**Risk Level**: ${input.riskLevel}`);}
+  if (input.businessImpact !== 'moderate') {descriptionParts.push(`**Business Impact**: ${input.businessImpact}`);}
+  if (input.lag) {descriptionParts.push(`**Timing**: ${lagValidation.displayText}`);}
+  if (!input.mandatory) {descriptionParts.push(`**Type**: Soft constraint`);}
   
   if (descriptionParts.length > 0) {
     payload.description = descriptionParts.join('\n\n');
@@ -205,22 +205,22 @@ export async function updateDependency({ env }: Ctx, input: z.infer<typeof updat
   const payload: any = {};
 
   // Update core fields
-  if (input.relationType !== undefined) payload.type = input.relationType;
+  if (input.relationType !== undefined) {payload.type = input.relationType;}
   
   // Build updated description with enterprise metadata
   const descriptionParts = [];
-  if (input.description !== undefined) descriptionParts.push(input.description);
+  if (input.description !== undefined) {descriptionParts.push(input.description);}
   
   // Add enterprise metadata to description
   const updates: string[] = [];
-  if (input.external !== undefined) updates.push(`External: ${input.external}`);
-  if (input.externalType !== undefined) updates.push(`External Type: ${input.externalType}`);
-  if (input.externalDescription !== undefined) updates.push(`External Details: ${input.externalDescription}`);
-  if (input.riskLevel !== undefined) updates.push(`Risk Level: ${input.riskLevel}`);
-  if (input.businessImpact !== undefined) updates.push(`Business Impact: ${input.businessImpact}`);
-  if (input.lag !== undefined) updates.push(`Lead/Lag: ${input.lag}`);
-  if (input.mandatory !== undefined) updates.push(`Mandatory: ${input.mandatory}`);
-  if (input.responseMode !== undefined) updates.push(`Response Mode: ${input.responseMode}`);
+  if (input.external !== undefined) {updates.push(`External: ${input.external}`);}
+  if (input.externalType !== undefined) {updates.push(`External Type: ${input.externalType}`);}
+  if (input.externalDescription !== undefined) {updates.push(`External Details: ${input.externalDescription}`);}
+  if (input.riskLevel !== undefined) {updates.push(`Risk Level: ${input.riskLevel}`);}
+  if (input.businessImpact !== undefined) {updates.push(`Business Impact: ${input.businessImpact}`);}
+  if (input.lag !== undefined) {updates.push(`Lead/Lag: ${input.lag}`);}
+  if (input.mandatory !== undefined) {updates.push(`Mandatory: ${input.mandatory}`);}
+  if (input.responseMode !== undefined) {updates.push(`Response Mode: ${input.responseMode}`);}
   
   if (updates.length > 0) {
     const existingDescription = current.description || "";
@@ -302,22 +302,22 @@ export async function analyzeDependencies({ env }: Ctx, input: z.infer<typeof an
     const metadata: any = {};
     
     // Parse metadata from description
-    if (description.includes('External: true')) metadata.external = true;
-    if (description.includes('Mandatory: false')) metadata.mandatory = false;
-    else metadata.mandatory = true;
+    if (description.includes('External: true')) {metadata.external = true;}
+    if (description.includes('Mandatory: false')) {metadata.mandatory = false;}
+    else {metadata.mandatory = true;}
     
     // Extract risk level
     const riskMatch = description.match(/Risk Level: (\w+)/);
-    if (riskMatch) metadata.riskLevel = riskMatch[1];
-    else metadata.riskLevel = 'medium';
+    if (riskMatch) {metadata.riskLevel = riskMatch[1];}
+    else {metadata.riskLevel = 'medium';}
     
     // Extract business impact  
     const impactMatch = description.match(/Business Impact: (\w+)/);
-    if (impactMatch) metadata.businessImpact = impactMatch[1];
+    if (impactMatch) {metadata.businessImpact = impactMatch[1];}
     
     // Extract lag time
     const lagMatch = description.match(/Lead\/Lag: ([^\\n]+)/);
-    if (lagMatch) metadata.lag = lagMatch[1];
+    if (lagMatch) {metadata.lag = lagMatch[1];}
 
     return { ...rel, metadata };
   });
@@ -379,11 +379,11 @@ export async function analyzeDependencies({ env }: Ctx, input: z.infer<typeof an
     // Forward pass - calculate earliest start times
     const visited = new Set<string>();
     const calculateEarliestStart = (nodeId: string): number => {
-      if (visited.has(nodeId)) return 0;
+      if (visited.has(nodeId)) {return 0;}
       visited.add(nodeId);
       
       const node = dependencyGraph.get(nodeId);
-      if (!node) return 0;
+      if (!node) {return 0;}
       
       let maxPredecessorEnd = 0;
       node.dependencies.forEach((depId: string) => {
@@ -605,7 +605,7 @@ export async function removeDependency({ env }: Ctx, input: z.infer<typeof remov
 
 // Helper function to calculate duration in days
 function calculateDuration(startDate?: string, endDate?: string): number {
-  if (!startDate || !endDate) return 1; // Default 1 day
+  if (!startDate || !endDate) {return 1;} // Default 1 day
   
   const start = new Date(startDate);
   const end = new Date(endDate);

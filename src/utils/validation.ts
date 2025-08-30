@@ -244,7 +244,7 @@ export function sanitizeHtml(html: string): string {
  * Validate and sanitize description fields
  */
 export function sanitizeDescription(description?: string): string | undefined {
-  if (!description) return undefined;
+  if (!description) {return undefined;}
   
   const trimmed = description.trim();
   return trimmed ? sanitizeHtml(trimmed) : undefined;

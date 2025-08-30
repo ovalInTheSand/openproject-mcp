@@ -7,7 +7,7 @@ import * as Sentry from "@sentry/cloudflare";
 export function captureError(e: unknown, context?: Record<string, unknown>) {
   try {
     Sentry.captureException(e, (scope) => {
-      if (context) scope.setContext("tool", context);
+      if (context) {scope.setContext("tool", context);}
       return scope;
     });
   } catch {

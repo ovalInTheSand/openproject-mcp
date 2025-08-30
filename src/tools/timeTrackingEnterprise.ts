@@ -61,21 +61,21 @@ export async function logTimeEntryEnterprise({ env }: Ctx, input: z.infer<typeof
   };
 
   // Add optional core fields
-  if (input.comment) payload.comment = input.comment;
-  if (input.ongoing !== undefined) payload.ongoing = input.ongoing;
+  if (input.comment) {payload.comment = input.comment;}
+  if (input.ongoing !== undefined) {payload.ongoing = input.ongoing;}
 
   // Enterprise time management
-  if (input.startTime) payload.startTime = input.startTime;
-  if (input.endTime) payload.endTime = input.endTime;
-  if (input.activityId) payload._links.activity = { href: `/api/v3/time_entries/activities/${input.activityId}` };
+  if (input.startTime) {payload.startTime = input.startTime;}
+  if (input.endTime) {payload.endTime = input.endTime;}
+  if (input.activityId) {payload._links.activity = { href: `/api/v3/time_entries/activities/${input.activityId}` };}
 
   // Resource assignment
-  if (input.userId) payload._links.user = hal.user(input.userId);
+  if (input.userId) {payload._links.user = hal.user(input.userId);}
 
   // Cost accounting fields
-  if (input.billableHours !== undefined) payload.billableHours = input.billableHours;
-  if (input.billingRate !== undefined) payload.billingRate = input.billingRate;
-  if (input.costRate !== undefined) payload.costRate = input.costRate;
+  if (input.billableHours !== undefined) {payload.billableHours = input.billableHours;}
+  if (input.billingRate !== undefined) {payload.billingRate = input.billingRate;}
+  if (input.costRate !== undefined) {payload.costRate = input.costRate;}
 
   // Custom fields
   if (input.customFields) {
@@ -130,12 +130,12 @@ export async function updateTimeEntryEnterprise({ env }: Ctx, input: z.infer<typ
   const payload: any = {};
 
   // Update core fields
-  if (input.spentOn !== undefined) payload.spentOn = input.spentOn;
-  if (input.hours !== undefined) payload.hours = input.hours;
-  if (input.comment !== undefined) payload.comment = input.comment;
-  if (input.ongoing !== undefined) payload.ongoing = input.ongoing;
-  if (input.startTime !== undefined) payload.startTime = input.startTime;
-  if (input.endTime !== undefined) payload.endTime = input.endTime;
+  if (input.spentOn !== undefined) {payload.spentOn = input.spentOn;}
+  if (input.hours !== undefined) {payload.hours = input.hours;}
+  if (input.comment !== undefined) {payload.comment = input.comment;}
+  if (input.ongoing !== undefined) {payload.ongoing = input.ongoing;}
+  if (input.startTime !== undefined) {payload.startTime = input.startTime;}
+  if (input.endTime !== undefined) {payload.endTime = input.endTime;}
 
   // Update links
   payload._links = {};
@@ -144,9 +144,9 @@ export async function updateTimeEntryEnterprise({ env }: Ctx, input: z.infer<typ
   }
 
   // Update cost fields
-  if (input.billableHours !== undefined) payload.billableHours = input.billableHours;
-  if (input.billingRate !== undefined) payload.billingRate = input.billingRate;
-  if (input.costRate !== undefined) payload.costRate = input.costRate;
+  if (input.billableHours !== undefined) {payload.billableHours = input.billableHours;}
+  if (input.billingRate !== undefined) {payload.billingRate = input.billingRate;}
+  if (input.costRate !== undefined) {payload.costRate = input.costRate;}
 
   // Update custom fields
   if (input.customFields) {

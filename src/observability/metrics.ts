@@ -7,9 +7,11 @@ function inc(name: string, by = 1) { counters[name] = (counters[name] || 0) + by
 export function recordRequest() { inc('requests_total'); }
 export function recordRateLimited() { inc('rate_limited_total'); }
 export function recordToolCall(tool: string, outcome: ToolOutcome) { inc(`tool_calls_total|${tool}|${outcome}`); }
+export function recordHmacFailure(code?: string) { inc(`hmac_fail_total${code?('|'+code):''}`); }
 export function observeToolLatency(tool: string, ms: number) {
   let binned = false;
   for (const b of BUCKETS) { if (ms <= b) { inc(`tool_latency_ms_bucket|${tool}|<=${b}`); binned = true; break; } }
-  if (!binned) inc(`tool_latency_ms_bucket|${tool}|>1000`);
+  if (!binned) {inc(`tool_latency_ms_bucket|${tool}|>1000`);}
 }
 export function getMetricsSnapshot() { return { counters: { ...counters } }; }
+export function recordScopeDenied(scope: string, tool: string) { inc(`scope_denied_total|${scope}|${tool}`); }

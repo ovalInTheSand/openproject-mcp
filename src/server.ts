@@ -1,6 +1,6 @@
 // src/server.ts
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { getMetricsSnapshot, observeToolLatency, recordToolCall } from './observability/metrics.js';
+import { getMetricsSnapshot, observeToolLatency, recordToolCall, recordScopeDenied } from './observability/metrics.js';
 import { VERSION } from "./constants/version";
 import { z } from "zod";
 import {
@@ -165,7 +165,7 @@ function toFieldMap(schema: any): Record<string, z.ZodTypeAny> {
     typeof schema === "object" &&
     !schema?.safeParse &&
     Object.values(schema).every((v) => typeof (v as any)?.safeParse === "function");
-  if (isFieldMap) return schema as Record<string, z.ZodTypeAny>;
+  if (isFieldMap) {return schema as Record<string, z.ZodTypeAny>;}
 
   // z.object(...) -> extract its shape
   if (schema?.safeParse) {
@@ -174,7 +174,7 @@ function toFieldMap(schema: any): Record<string, z.ZodTypeAny> {
       typeof def?.shape === "function" ? def.shape() :
       (schema as any).shape ??
       undefined;
-    if (shape && typeof shape === "object") return shape as Record<string, z.ZodTypeAny>;
+    if (shape && typeof shape === "object") {return shape as Record<string, z.ZodTypeAny>;}
   }
 
   throw new Error("tool(): `schema` must be a Zod object or a record of Zod fields.");
@@ -182,7 +182,7 @@ function toFieldMap(schema: any): Record<string, z.ZodTypeAny> {
 
 // Pretty-printer for the text content block
 const toPretty = (v: unknown) => {
-  if (typeof v === "string") return v;
+  if (typeof v === "string") {return v;}
   try { return JSON.stringify(v, null, 2); } catch { return String(v); }
 };
 
@@ -201,6 +201,25 @@ async function withTimeout<T>(promise: Promise<T>, ms: number, name: string): Pr
   } finally {
     clearTimeout(timer);
   }
+}
+
+// Basic RBAC: env.MCP_TOOL_SCOPES = JSON string: { "tool.name": ["scopeA"], "*": ["defaultScope"] }
+function resolveScopes(env: any): Record<string,string[]> {
+  try {
+    const raw = env?.MCP_TOOL_SCOPES; if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === 'object') { return parsed; }
+  } catch {}
+  return {};
+}
+
+function hasRequiredScopes(tool: string, env: any, provided: string[]|undefined): true | string {
+  const map = resolveScopes(env);
+  const required = map[tool] || map['*'];
+  if (!required || !required.length) return true;
+  const p = new Set((provided||[]).map(s=>s.toLowerCase()));
+  const missing = required.filter(r=>!p.has(r.toLowerCase()));
+  return missing.length ? missing.join(',') : true;
 }
 
 function registerToolHelper<
@@ -227,15 +246,30 @@ function registerToolHelper<
         extra?.requestInfo?.env ??
         (globalThis as any)?.ENV ??
         {};
+      // Scopes provided by client via header 'x-mcp-scopes' (comma list) if allowed
+      let providedScopes: string[]|undefined;
+      try { const h = extra?.requestInfo?.req?.headers?.get?.('x-mcp-scopes'); if (h) { providedScopes = h.split(',').map((s:string)=>s.trim()).filter(Boolean); } } catch {}
+      const scopeCheck = hasRequiredScopes(name, env, providedScopes);
+      if (scopeCheck !== true) {
+        recordScopeDenied(String(scopeCheck), name);
+        return { isError:true, structuredContent:{ code:'forbidden', message:`Missing required scopes: ${scopeCheck}` }, content:[{ type:'text', text:`Error: Missing required scopes: ${scopeCheck}` }] };
+      }
 
       try {
         const typedInput = input as InferInput<T>;
         const execTimeout = perToolTimeout(name, env);
         const t0 = Date.now();
-        const result = await withTimeout(handler({ env }, typedInput), execTimeout, name);
+        const ac = new AbortController();
+        // Expose signal for downstream fetches
+        (env as any).MCP_ABORT_SIGNAL = ac.signal;
+        const timer = setTimeout(()=>{ try { ac.abort(); } catch {} }, execTimeout);
+        let result: any;
+        try {
+          result = await handler({ env }, typedInput);
+        } finally { clearTimeout(timer); delete (env as any).MCP_ABORT_SIGNAL; }
         observeToolLatency(name, Date.now() - t0);
         recordToolCall(name, 'success');
-        return {
+  return {
           content: [{ type: "text", text: toPretty(result) }],
           structuredContent: result,
         };
@@ -246,7 +280,16 @@ function registerToolHelper<
         const body = e?.body ?? undefined;
         const msg = e?.message ? String(e.message) : "Tool execution failed";
         const code = isTimeout ? 'tool_timeout' : (e?.code || 'upstream_error');
-        const errJson = { code, message: msg, status, body };
+        const redact = (obj: any) => {
+          if (!obj || typeof obj !== 'object') {return obj;}
+          const shallow: any = Array.isArray(obj) ? [] : {};
+          for (const [k,v] of Object.entries(obj)) {
+            if (/auth|token|secret|password/i.test(k)) {shallow[k] = '[redacted]';}
+            else {shallow[k] = v;}
+          }
+          return shallow;
+        };
+        const errJson = { code, message: msg, status, body: redact(body) };
         return {
           content: [{ type: "text", text: `Error: ${msg}\n${toPretty(errJson)}` }],
           structuredContent: errJson,
@@ -260,11 +303,11 @@ function registerToolHelper<
 function perToolTimeout(tool: string, env: any): number {
   const base = parseInt(env?.MCP_TOOL_TIMEOUT_MS || '15000', 10) || 15000;
   const raw = env?.MCP_TOOL_TIMEOUT_MAP;
-  if (!raw) return base;
+  if (!raw) {return base;}
   try {
     const map = JSON.parse(raw);
     const v = map[tool];
-    if (Number.isFinite(v) && v > 0 && v <= 60000) return v;
+    if (Number.isFinite(v) && v > 0 && v <= 60000) {return v;}
   } catch {}
   return base;
 }
@@ -854,9 +897,9 @@ export function buildServer() {
     let names: string[] = [];
     const raw = (server as any).tools;
     if (raw) {
-      if (typeof raw.keys === 'function') names = Array.from(raw.keys());
-      else if (Array.isArray(raw)) names = raw.map((t: any)=>String(t?.name||''));
-      else if (typeof raw === 'object') names = Object.keys(raw);
+      if (typeof raw.keys === 'function') {names = Array.from(raw.keys());}
+      else if (Array.isArray(raw)) {names = raw.map((t: any)=>String(t?.name||''));}
+      else if (typeof raw === 'object') {names = Object.keys(raw);}
     }
     names = names.filter(Boolean).sort();
     return { tools: names, count: names.length };

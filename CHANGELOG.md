@@ -31,6 +31,50 @@ Centralized metrics module, enhanced middleware with layered guards, and per-too
 
 No breaking API changes; minor additive capabilities (two new system tools). Recommended upgrade for stronger security posture.
 
+## [3.3.0] - 2025-08-30
+
+### ✅ Summary
+Incremental security & reliability hardening atop 3.2.0 with scoped RBAC, enforced HTTPS (opt-out flag), abortable tool execution, improved cache discipline, and enhanced metrics. All changes are backward compatible & additive. Recommended for all users adopting 3.x security controls.
+
+### 🔐 Security / Access Control
+- Added environment‑driven RBAC scope gating (`MCP_TOOL_SCOPES` + `x-mcp-scopes` header) with denial metrics.
+- HTTPS enforcement for `OP_BASE_URL`; clear opt‑in override via `OP_ALLOW_INSECURE_HTTP=true` (development only).
+- Prototype pollution guard expanded & centralized; weak secret rejection retained.
+- Error redaction now masks additional credential-shaped keys consistently.
+
+### ⏱️ Execution Control
+- Introduced AbortController-based per-tool cancellation; long running tools are actively aborted (including upstream fetch) when exceeding timeout.
+- Unified timeout error code: `tool_timeout` with structured detail.
+
+### 🗄️ Caching & Data Integrity
+- Cache manager: precise hit/miss accounting moved into `get()`, soft LRU-style eviction (oldest entries pruned at cap) to prevent unbounded growth.
+- Portfolio/hybrid manager: normalized composite cache keys (sorted identifiers) preventing duplicate entries; resource utilization entries timestamped (`_cachedAt`) enabling daily recomputation heuristics.
+
+### 📊 Metrics & Observability
+- Added counters: `hmac_fail` (existing), new `scope_denied` for RBAC, and timeout tracking through unified code path.
+- Hit ratio improvements reflected via corrected accounting method.
+
+### 🧪 Testing
+- Added security-focused test suite (HMAC, RBAC, rate limit, input guards). Tests gracefully skip when live server not running to avoid false negatives in CI without network.
+
+### 📄 Documentation
+- README Security & Access Control section expanded with RBAC scopes examples and updated feature table (`v3.2.x` section retains compatibility notes; version header updated to 3.3.0).
+- SECURITY-CHECKLIST updated with runtime controls reflecting new abort mechanism and RBAC details.
+
+### ♻️ Internal Refinements
+- Centralized redaction & scope resolution utilities inside server bootstrap.
+- Reduced duplicate promise race wrappers in favor of intrinsic abort signaling.
+
+### Migration Notes
+No action required for existing 3.2.0 deployments unless enabling new RBAC scopes. To adopt RBAC:
+1. Set `MCP_TOOL_SCOPES` JSON mapping (include "*" for default scopes).
+2. Provide `x-mcp-scopes` header from client listing granted scopes.
+3. Monitor `system.getMetrics` for `scope_denied` to validate configuration.
+
+### Integrity Statement
+All changes validated via TypeScript build (no new type errors) and targeted security tests. Functional behavior of existing tools unchanged unless restricted by newly configured scopes.
+
+
 ### 🎯 **Major Release - Professional Private Package**
 
 This release transforms the OpenProject MCP server from an enterprise prototype into a professional, production-ready package optimized for private use while establishing the foundation for future public release. Built on LESSONS.yaml discoveries and real deployment experience with `thisistheway.local`.

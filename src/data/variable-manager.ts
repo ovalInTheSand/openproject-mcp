@@ -168,7 +168,7 @@ export class PMOVariableManager {
     PMOVariablesSchema.parse(completeDefaults);
     
     // In a real implementation, persist these defaults
-    console.log('Organizational defaults would be persisted:', defaults);
+  import('../util/logger').then(m => m.log.debug('org_defaults_stub_persist', { count: Object.keys(defaults).length })).catch(()=>{});
   }
   
   /**
@@ -488,7 +488,7 @@ export class PMOVariableManager {
     // 2. Create them if they don't exist
     // 3. Set appropriate permissions and validations
     
-    console.log('PMO custom fields would be created/validated here');
+  import('../util/logger').then(m => m.log.debug('pmo_custom_fields_stub')).catch(()=>{});
   }
 }
 

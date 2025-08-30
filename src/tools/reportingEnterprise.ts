@@ -65,7 +65,7 @@ export async function generateEarnedValue(ctx: Ctx, input: z.infer<typeof genera
   // Normalize any null numeric fields (edge case when no data yet)
   const cleaned: any = { ...evmResult };
   for (const k of ['plannedValue','earnedValue','actualCost','budgetAtCompletion']) {
-    if (cleaned[k] == null || !Number.isFinite(cleaned[k])) cleaned[k] = 0;
+    if (cleaned[k] == null || !Number.isFinite(cleaned[k])) {cleaned[k] = 0;}
   }
   return {
     ...cleaned,
@@ -289,10 +289,10 @@ export async function generateProjectDashboard(ctx: Ctx, input: z.infer<typeof g
 
 // Helper function to parse ISO 8601 duration
 function parseISO8601Duration(duration?: string): number {
-  if (!duration) return 0;
+  if (!duration) {return 0;}
   
   const match = duration.match(/^PT(?:(\d+(?:\.\d+)?)H)?(?:(\d+(?:\.\d+)?)D)?$/);
-  if (!match) return 0;
+  if (!match) {return 0;}
   
   const hours = parseFloat(match[1] || '0');
   const days = parseFloat(match[2] || '0');

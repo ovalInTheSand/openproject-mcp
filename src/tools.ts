@@ -60,8 +60,8 @@ export async function listWorkPackages({ env }: Ctx, input: z.infer<typeof listW
     offset: input.offset,
     pageSize: input.pageSize,
   };
-  if (input.filters !== undefined) params.filters = input.filters;
-  if (input.sortBy !== undefined) params.sortBy = input.sortBy;
+  if (input.filters !== undefined) {params.filters = input.filters;}
+  if (input.sortBy !== undefined) {params.sortBy = input.sortBy;}
 
   const path = withQuery(base, params);
   const { json } = await opFetch<any>(env, path);
@@ -98,12 +98,12 @@ export async function createWorkPackageViaForm({ env }: Ctx, input: z.infer<type
       type: hal.type(input.typeId),
     },
   };
-  if (input.description) payload.description = input.description;
-  if (input.assigneeId) payload._links.assignee = hal.user(input.assigneeId);
-  if (input.priorityId) payload._links.priority = hal.priority(input.priorityId);
-  if (input.parentId) payload._links.parent = hal.workPackage(input.parentId);
-  if (input.startDate) payload.startDate = input.startDate;
-  if (input.dueDate) payload.dueDate = input.dueDate;
+  if (input.description) {payload.description = input.description;}
+  if (input.assigneeId) {payload._links.assignee = hal.user(input.assigneeId);}
+  if (input.priorityId) {payload._links.priority = hal.priority(input.priorityId);}
+  if (input.parentId) {payload._links.parent = hal.workPackage(input.parentId);}
+  if (input.startDate) {payload.startDate = input.startDate;}
+  if (input.dueDate) {payload.dueDate = input.dueDate;}
 
   const { json: form } = await opFetch<any>(env, "/api/v3/work_packages/form", {
     method: "POST",
@@ -116,7 +116,7 @@ export async function createWorkPackageViaForm({ env }: Ctx, input: z.infer<type
     return { ok: !hasErrors, validationErrors: errors, payload: form?.payload, schema: form?.schema };
   }
   const commit = form?._links?.commit;
-  if (!commit?.href) throw new Error("Form commit link missing");
+  if (!commit?.href) {throw new Error("Form commit link missing");}
   const { json: created } = await opFetch<any>(env, commit.href, {
     method: commit.method || "POST",
     body: JSON.stringify(form.payload),
@@ -146,16 +146,16 @@ export const updateWPInput = z.object({
 export async function updateWorkPackage({ env }: Ctx, input: z.infer<typeof updateWPInput>) {
   // Build payload for PATCH /api/v3/work_packages/{id} per spec.
   const body: any = { lockVersion: input.lockVersion };
-  if (input.subject !== undefined) body.subject = input.subject;
-  if (input.description) body.description = input.description;
+  if (input.subject !== undefined) {body.subject = input.subject;}
+  if (input.description) {body.description = input.description;}
   body._links = body._links || {};
-  if (input.typeId) body._links.type = hal.type(input.typeId);
-  if (input.statusId) body._links.status = hal.status(input.statusId);
-  if (input.assigneeId) body._links.assignee = hal.user(input.assigneeId);
-  if (input.priorityId) body._links.priority = hal.priority(input.priorityId);
-  if (input.parentId) body._links.parent = hal.workPackage(input.parentId);
-  if (input.startDate) body.startDate = input.startDate;
-  if (input.dueDate) body.dueDate = input.dueDate;
+  if (input.typeId) {body._links.type = hal.type(input.typeId);}
+  if (input.statusId) {body._links.status = hal.status(input.statusId);}
+  if (input.assigneeId) {body._links.assignee = hal.user(input.assigneeId);}
+  if (input.priorityId) {body._links.priority = hal.priority(input.priorityId);}
+  if (input.parentId) {body._links.parent = hal.workPackage(input.parentId);}
+  if (input.startDate) {body.startDate = input.startDate;}
+  if (input.dueDate) {body.dueDate = input.dueDate;}
 
   if (input.dryRun) {
     // Validate via forms mechanism (do not commit).
@@ -229,7 +229,7 @@ export const listQueriesInput = z.object({
 
 export async function listQueries({ env }: Ctx, input: z.infer<typeof listQueriesInput>) {
   const params: Record<string, unknown> = { offset: input.offset, pageSize: input.pageSize };
-  if (input.filters !== undefined) params.filters = input.filters;
+  if (input.filters !== undefined) {params.filters = input.filters;}
   const { json } = await opFetch<any>(env, "/api/v3/queries", { params });
   const meta = parseCollectionMeta(json);
   const elements = json?._embedded?.elements ?? [];
@@ -252,7 +252,7 @@ export async function runQuery({ env }: Ctx, input: z.infer<typeof runQueryInput
   const params: Record<string, unknown> = {};
   for (const k of ["filters", "offset", "pageSize", "sortBy", "groupBy", "showSums", "timestamps"] as const) {
     const v = (input as any)[k];
-    if (v !== undefined) params[k] = v;
+    if (v !== undefined) {params[k] = v;}
   }
   const { json: q } = await opFetch<any>(env, `/api/v3/queries/${input.id}`, { params });
 
@@ -264,7 +264,7 @@ export async function runQuery({ env }: Ctx, input: z.infer<typeof runQueryInput
   }
 
   const href: string | undefined = q?._links?.results?.href;
-  if (!href) return { query: q, results: null };
+  if (!href) {return { query: q, results: null };}
 
   const { json } = await opFetch<any>(env, href);
   const meta = parseCollectionMeta(json);

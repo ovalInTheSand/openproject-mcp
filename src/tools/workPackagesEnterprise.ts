@@ -92,28 +92,28 @@ export async function createWorkPackageEnterprise({ env }: Ctx, input: z.infer<t
   };
 
   // Add scheduling fields
-  if (input.description) payload.description = input.description;
-  if (input.startDate) payload.startDate = input.startDate;
-  if (input.dueDate) payload.dueDate = input.dueDate;
-  if (input.estimatedTime) payload.estimatedTime = input.estimatedTime;
-  if (input.percentageDone !== undefined) payload.percentageDone = input.percentageDone;
-  if (input.scheduleManually !== undefined) payload.scheduleManually = input.scheduleManually;
+  if (input.description) {payload.description = input.description;}
+  if (input.startDate) {payload.startDate = input.startDate;}
+  if (input.dueDate) {payload.dueDate = input.dueDate;}
+  if (input.estimatedTime) {payload.estimatedTime = input.estimatedTime;}
+  if (input.percentageDone !== undefined) {payload.percentageDone = input.percentageDone;}
+  if (input.scheduleManually !== undefined) {payload.scheduleManually = input.scheduleManually;}
 
   // Resource assignments
-  if (input.assigneeId) payload._links.assignee = hal.user(input.assigneeId);
-  if (input.responsibleId) payload._links.responsible = hal.user(input.responsibleId);
+  if (input.assigneeId) {payload._links.assignee = hal.user(input.assigneeId);}
+  if (input.responsibleId) {payload._links.responsible = hal.user(input.responsibleId);}
 
   // Project structure
-  if (input.parentId) payload._links.parent = hal.workPackage(input.parentId);
-  if (input.versionId) payload._links.version = { href: `/api/v3/versions/${input.versionId}` };
+  if (input.parentId) {payload._links.parent = hal.workPackage(input.parentId);}
+  if (input.versionId) {payload._links.version = { href: `/api/v3/versions/${input.versionId}` };}
 
   // Status and priority
-  if (input.statusId) payload._links.status = hal.status(input.statusId);
-  if (input.priorityId) payload._links.priority = hal.priority(input.priorityId);
+  if (input.statusId) {payload._links.status = hal.status(input.statusId);}
+  if (input.priorityId) {payload._links.priority = hal.priority(input.priorityId);}
 
   // Enterprise fields
-  if (input.budgetId) payload._links.budget = { href: `/api/v3/budgets/${input.budgetId}` };
-  if (input.categoryId) payload._links.category = { href: `/api/v3/categories/${input.categoryId}` };
+  if (input.budgetId) {payload._links.budget = { href: `/api/v3/budgets/${input.budgetId}` };}
+  if (input.categoryId) {payload._links.category = { href: `/api/v3/categories/${input.categoryId}` };}
 
   // Custom fields
   if (input.customFields) {
@@ -148,7 +148,7 @@ export async function createWorkPackageEnterprise({ env }: Ctx, input: z.infer<t
 
   // Commit creation
   const commit = form?._links?.commit;
-  if (!commit?.href) throw new Error("Form commit link missing");
+  if (!commit?.href) {throw new Error("Form commit link missing");}
   
   const { json: created } = await opFetch<any>(env, commit.href, {
     method: commit.method || "POST",
@@ -209,26 +209,26 @@ export async function updateWorkPackageEnterprise({ env }: Ctx, input: z.infer<t
   };
 
   // Update core fields
-  if (input.subject !== undefined) payload.subject = input.subject;
-  if (input.description !== undefined) payload.description = input.description;
+  if (input.subject !== undefined) {payload.subject = input.subject;}
+  if (input.description !== undefined) {payload.description = input.description;}
   
   // Update scheduling
-  if (input.startDate !== undefined) payload.startDate = input.startDate;
-  if (input.dueDate !== undefined) payload.dueDate = input.dueDate;
-  if (input.estimatedTime !== undefined) payload.estimatedTime = input.estimatedTime;
-  if (input.percentageDone !== undefined) payload.percentageDone = input.percentageDone;
-  if (input.scheduleManually !== undefined) payload.scheduleManually = input.scheduleManually;
+  if (input.startDate !== undefined) {payload.startDate = input.startDate;}
+  if (input.dueDate !== undefined) {payload.dueDate = input.dueDate;}
+  if (input.estimatedTime !== undefined) {payload.estimatedTime = input.estimatedTime;}
+  if (input.percentageDone !== undefined) {payload.percentageDone = input.percentageDone;}
+  if (input.scheduleManually !== undefined) {payload.scheduleManually = input.scheduleManually;}
 
   // Update links
   payload._links = {};
-  if (input.assigneeId !== undefined) payload._links.assignee = input.assigneeId ? hal.user(input.assigneeId) : null;
-  if (input.responsibleId !== undefined) payload._links.responsible = input.responsibleId ? hal.user(input.responsibleId) : null;
-  if (input.parentId !== undefined) payload._links.parent = input.parentId ? hal.workPackage(input.parentId) : null;
-  if (input.versionId !== undefined) payload._links.version = input.versionId ? { href: `/api/v3/versions/${input.versionId}` } : null;
-  if (input.statusId !== undefined) payload._links.status = input.statusId ? hal.status(input.statusId) : null;
-  if (input.priorityId !== undefined) payload._links.priority = input.priorityId ? hal.priority(input.priorityId) : null;
-  if (input.budgetId !== undefined) payload._links.budget = input.budgetId ? { href: `/api/v3/budgets/${input.budgetId}` } : null;
-  if (input.categoryId !== undefined) payload._links.category = input.categoryId ? { href: `/api/v3/categories/${input.categoryId}` } : null;
+  if (input.assigneeId !== undefined) {payload._links.assignee = input.assigneeId ? hal.user(input.assigneeId) : null;}
+  if (input.responsibleId !== undefined) {payload._links.responsible = input.responsibleId ? hal.user(input.responsibleId) : null;}
+  if (input.parentId !== undefined) {payload._links.parent = input.parentId ? hal.workPackage(input.parentId) : null;}
+  if (input.versionId !== undefined) {payload._links.version = input.versionId ? { href: `/api/v3/versions/${input.versionId}` } : null;}
+  if (input.statusId !== undefined) {payload._links.status = input.statusId ? hal.status(input.statusId) : null;}
+  if (input.priorityId !== undefined) {payload._links.priority = input.priorityId ? hal.priority(input.priorityId) : null;}
+  if (input.budgetId !== undefined) {payload._links.budget = input.budgetId ? { href: `/api/v3/budgets/${input.budgetId}` } : null;}
+  if (input.categoryId !== undefined) {payload._links.category = input.categoryId ? { href: `/api/v3/categories/${input.categoryId}` } : null;}
 
   // Update custom fields
   if (input.customFields) {
@@ -263,7 +263,7 @@ export async function updateWorkPackageEnterprise({ env }: Ctx, input: z.infer<t
 
   // Commit update
   const commit = form?._links?.commit;
-  if (!commit?.href) throw new Error("Form commit link missing");
+  if (!commit?.href) {throw new Error("Form commit link missing");}
   
   const { json: updated } = await opFetch<any>(env, commit.href, {
     method: commit.method || "PATCH",

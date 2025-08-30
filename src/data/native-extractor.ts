@@ -214,11 +214,11 @@ export class NativeOpenProjectExtractor {
    * Parse ISO 8601 duration to hours (OpenProject format: PT8H, PT1D, etc.)
    */
   private parseISO8601Duration(duration?: string): number {
-    if (!duration) return 0;
+    if (!duration) {return 0;}
     
     // Match PT followed by numbers and units (H for hours, D for days)
     const match = duration.match(/^PT(?:(\d+(?:\.\d+)?)H)?(?:(\d+(?:\.\d+)?)D)?$/);
-    if (!match) return 0;
+    if (!match) {return 0;}
     
     const hours = parseFloat(match[1] || '0');
     const days = parseFloat(match[2] || '0');
@@ -321,8 +321,8 @@ export class NativeOpenProjectExtractor {
     
     // Simple risk assessment based on native data
     let riskLevel: 'Low' | 'Medium' | 'High' = 'Low';
-    if (hasOverdueItems || completionRate < 50) riskLevel = 'Medium';
-    if (issueCount > 5 || completionRate < 25) riskLevel = 'High';
+    if (hasOverdueItems || completionRate < 50) {riskLevel = 'Medium';}
+    if (issueCount > 5 || completionRate < 25) {riskLevel = 'High';}
     
     // Find next milestone
     const upcomingMilestone = metrics.workPackages

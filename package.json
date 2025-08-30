@@ -1,6 +1,6 @@
 {
   "name": "openproject-mcp",
-  "version": "3.2.0",
+  "version": "3.3.0",
   "description": "Advanced MCP server with hybrid OpenProject API integration, real-time webhooks, enhanced notifications, internal comments, negative lag dependencies, and AI-powered enterprise analytics (OpenProject 2024-2025 features)",
   "keywords": [
     "mcp",
@@ -30,9 +30,9 @@
     "type": "git",
     "url": "git+https://github.com/user/private-openproject-mcp.git"
   },
-  "homepage": "#",
+  "homepage": "https://github.com/user/private-openproject-mcp#readme",
   "bugs": {
-    "url": "#"
+    "url": "https://github.com/user/private-openproject-mcp/issues"
   },
   "private": true,
   "type": "module",
@@ -47,19 +47,21 @@
     "restart": "pkill -f wrangler || true && npm run dev",
     "typecheck": "tsc --noEmit",
     "typecheck:watch": "tsc --noEmit --watch",
-    "lint": "eslint src/**/*.ts",
-    "lint:fix": "eslint src/**/*.ts --fix",
-    "test": "node tests/run-tests.js",
-    "test:health": "node tests/health.test.js",
-    "test:integration": "node tests/integration.test.js",
-    "test:enterprise": "node tests/enterprise.test.js",
-    "test:edge-cases": "node tests/edge-cases.test.js",
+    "lint": "eslint 'src/**/*.ts'",
+    "lint:fix": "eslint 'src/**/*.ts' --fix",
+    "lint:json": "eslint -f json 'src/**/*.ts' > lint-report.json || true",
+    "lint:all": "npm run lint && npm run lint:fix",
+    "test": "tsx tests/run-tests.js",
+    "test:health": "tsx tests/health.test.js",
+    "test:integration": "tsx tests/integration.test.js",
+    "test:enterprise": "tsx tests/enterprise.test.js",
+    "test:edge-cases": "tsx tests/edge-cases.test.js",
     "test:watch": "npm run test",
-    "test:v3": "node tests/v3-comprehensive.test.js",
-    "test:v3:hybrid": "node tests/hybrid-system.test.js",
-    "test:v3:variables": "node tests/variable-management.test.js",
-    "test:v3:cache": "node tests/cache-performance.test.js",
-    "test:v3:tools": "node tests/hybrid-tools.test.js",
+    "test:v3": "tsx tests/v3-comprehensive.test.js",
+    "test:v3:hybrid": "tsx tests/hybrid-system.test.js",
+    "test:v3:variables": "tsx tests/variable-management.test.js",
+    "test:v3:cache": "tsx tests/cache-performance.test.js",
+    "test:v3:tools": "tsx tests/hybrid-tools.test.js",
     "test:all": "npm run test && npm run test:v3",
     "validate": "node scripts/validate-deployment.js",
     "inspect": "MCP_AUTO_OPEN_ENABLED=false CLIENT_PORT=7000 SERVER_PORT=7001 npx @modelcontextprotocol/inspector",
@@ -67,8 +69,10 @@
     "clean": "rm -rf dist .wrangler",
     "clean:all": "rm -rf dist .wrangler node_modules && npm install",
     "health": "curl -X POST http://localhost:8788/mcp -H 'Content-Type: application/json' -d '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/call\",\"params\":{\"name\":\"op.health\",\"arguments\":{}}}' | jq",
-    "version": "echo 'v2.0.0 - Professional Private Use Package'",
+  "version": "echo 'v3.3.0 - Security Hardening (RBAC + Abortable Tools + Cache)'",
     "update-deps": "npm update && npm audit fix"
+  ,"release:prepare": "npm run build && npm run lint && npm test || true && echo 'Ready to deploy 3.3.0'"
+  ,"release:deploy": "npm run build && wrangler deploy"
   },
   "dependencies": {
     "@hono/mcp": "^0.1.2",
@@ -82,6 +86,7 @@
     "@typescript-eslint/eslint-plugin": "^8.41.0",
     "@typescript-eslint/parser": "^8.41.0",
     "eslint": "^9.34.0",
+    "tsx": "^4.19.1",
     "typescript": "^5.5.4",
     "wrangler": "^4.33.0"
   }

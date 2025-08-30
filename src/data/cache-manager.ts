@@ -17,6 +17,7 @@ import type {
  */
 export class CacheManager {
   private cache: Map<string, CacheEntry<any>> = new Map();
+  private maxEntries = 500; // soft cap
   private readonly strategy: CacheStrategy = {
     neverCache: [
       'workPackageProgress',
@@ -57,15 +58,20 @@ export class CacheManager {
     const entry = this.cache.get(cacheKey);
     
     if (!entry) {
+      // Track miss
+      this.trackCacheAccess(false);
       return null;
     }
-    
+
     // Check if entry has expired
     if (this.isExpired(entry)) {
       this.cache.delete(cacheKey);
+      this.trackCacheAccess(false);
       return null;
     }
-    
+
+    // Track hit
+    this.trackCacheAccess(true);
     return entry.data as T;
   }
   
@@ -95,6 +101,11 @@ export class CacheManager {
     };
     
     this.cache.set(cacheKey, entry);
+    // LRU-ish: if over cap, remove oldest by timestamp
+    if (this.cache.size > this.maxEntries) {
+      const oldest = Array.from(this.cache.entries()).sort((a,b)=>a[1].timestamp - b[1].timestamp).slice(0, Math.max(0, this.cache.size - this.maxEntries));
+      oldest.forEach(([k])=>this.cache.delete(k));
+    }
   }
   
   /**
@@ -349,7 +360,7 @@ export class CacheManager {
     keysToDelete.forEach(key => this.cache.delete(key));
     
     if (keysToDelete.length > 0) {
-      console.log(`Cache cleanup: Removed ${keysToDelete.length} expired entries`);
+      import('../util/logger').then(m => m.log.debug('cache_cleanup', { removed: keysToDelete.length })).catch(()=>{});
     }
     
     this.lastCleanup = Date.now();
@@ -370,7 +381,7 @@ export class CacheManager {
   private cacheHits: number = 0;
   
   private calculateHitRate(): number {
-    if (this.totalRequests === 0) return 0;
+    if (this.totalRequests === 0) {return 0;}
     return Math.round((this.cacheHits / this.totalRequests) * 100) / 100;
   }
   
@@ -391,9 +402,7 @@ export class CacheManager {
    * Enhanced get method with performance tracking
    */
   async getWithTracking<T>(key: string, projectId?: string | number): Promise<T | null> {
-    const result = await this.get<T>(key, projectId);
-    this.trackCacheAccess(result !== null);
-    return result;
+  return this.get<T>(key, projectId); // tracking already inside get()
   }
   
   /**
@@ -437,14 +446,14 @@ export class CacheManager {
     if (stats.hitRate < 0.5) {
       issues.push('Low cache hit rate');
       recommendations.push('Review caching strategy and TTL values');
-      if (status === 'healthy') status = 'warning';
+      if (status === 'healthy') {status = 'warning';}
     }
     
     // Check memory usage (rough estimate)
     if (stats.totalEntries > 1000) {
       issues.push('High number of cached entries');
       recommendations.push('Consider implementing LRU eviction or reducing cache size');
-      if (status === 'healthy') status = 'warning';
+      if (status === 'healthy') {status = 'warning';}
     }
     
     return { status, issues, recommendations };

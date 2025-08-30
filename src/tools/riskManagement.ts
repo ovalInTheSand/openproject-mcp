@@ -567,7 +567,7 @@ export async function generateRiskBurndown(
   // Generate risk trend analysis over time
   if (input.showTrends) {
     // Get activities for risk work packages to track changes over time
-    let trendAnalysis = [];
+    const trendAnalysis = [];
     
     for (const risk of risks.slice(0, 10)) { // Limit to avoid too many API calls
       try {
@@ -642,16 +642,16 @@ function calculateRiskScore(probability: string, impact: string): number {
 }
 
 function getRiskSeverityFromScore(score: number): string {
-  if (score >= 20) return "critical";
-  if (score >= 15) return "high";
-  if (score >= 8) return "medium";
+  if (score >= 20) {return "critical";}
+  if (score >= 15) {return "high";}
+  if (score >= 8) {return "medium";}
   return "low";
 }
 
 function getRiskPriorityFromScore(score: number): number {
-  if (score >= 20) return 1; // Highest priority
-  if (score >= 15) return 2; // High priority  
-  if (score >= 8) return 3;  // Medium priority
+  if (score >= 20) {return 1;} // Highest priority
+  if (score >= 15) {return 2;} // High priority  
+  if (score >= 8) {return 3;}  // Medium priority
   return 4; // Low priority
 }
 
@@ -723,7 +723,7 @@ function generateProbabilityImpactMatrix(riskData: any[], input: any) {
   };
 
   riskData.forEach(risk => {
-    if (matrix[risk.probability] && matrix[risk.probability][risk.impact]) {
+    if (matrix[risk.probability]?.[risk.impact]) {
       matrix[risk.probability][risk.impact].push({
         id: risk.id,
         subject: risk.subject,

@@ -1,4 +1,4 @@
-# OpenProject MCP Server v3.2.0 🚀
+# OpenProject MCP Server v3.3.0 🚀
 
 **Advanced MCP server with hybrid OpenProject API integration, real-time webhooks, enhanced notifications, internal comments, negative lag dependencies, dynamic PMO variables, and AI-powered enterprise analytics**
 
@@ -125,6 +125,36 @@ npm run dev
 # - http://localhost:8788/sse (optional real-time events, disabled by default)
 ```
 
+## 🔒 Security & Access Control (v3.3.x)
+
+| Feature | Env / Header | Description |
+|---------|--------------|-------------|
+| Rate Limiting | MCP_RATE_LIMIT / MCP_RATE_WINDOW_MS | Per-IP sliding window (default 200 req / 60s) |
+| Body Size Limit | MCP_MAX_BODY_BYTES | Reject oversized JSON bodies (default 512KB) |
+| HMAC Signatures | MCP_HMAC_SECRET (+ MCP_HMAC_MAX_SKEW_SEC) | x-mcp-signature / timestamp / nonce (replay protected) |
+| RBAC Scopes | MCP_TOOL_SCOPES + x-mcp-scopes | JSON mapping tool→scopes; deny if missing |
+| Egress Allowlist | MCP_EGRESS_ALLOW | Restricts outbound fetch hosts (always includes OP host) |
+| HTTPS Enforcement | OP_ALLOW_INSECURE_HTTP=true (opt‑in) | Blocks http:// OP_BASE_URL unless permitted |
+| Input Guards | MCP_MAX_ARRAY_ITEMS, MCP_MAX_STRING_LENGTH, MCP_MAX_NESTING_DEPTH, MCP_MAX_FILTERS | Depth / length / filters protection (422) |
+| Tool Timeouts | MCP_TOOL_TIMEOUT_MS / MCP_TOOL_TIMEOUT_MAP | AbortController cancels overruns (default 15s) |
+| Error Redaction | (automatic) | auth/token/secret/password fields masked in errors |
+| Metrics | system.getMetrics | Counters: tool success/error/timeout, hmac_fail, scope_denied |
+
+Example `MCP_TOOL_SCOPES`:
+```bash
+export MCP_TOOL_SCOPES='{"wp.create":["write"],"wp.update":["write"],"reports.earnedValue":["analytics"],"*":["read"]}'
+```
+Client supplies: `x-mcp-scopes: read,analytics`.
+
+HMAC headers example:
+```
+x-mcp-timestamp: 1725012345
+x-mcp-nonce: 550e8400-e29b-41d4-a716-446655440000
+x-mcp-signature: v1=<hex sha256(ts.nonce.body)>
+```
+Secrets shorter than 32 chars return 401 with code `weak_secret`.
+
+
 ### Testing with Claude Code
 
 1. Configure Claude Code to use your MCP server endpoint
@@ -136,7 +166,7 @@ npm run dev
      -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
    ```
 
-## Available Tools (Updated 3.2.0 Overview)
+## Available Tools (Updated 3.3.0 Overview)
 
 Key additions in 3.2.0:
 - Security hardening (rate limiting overrides, HMAC signing, nonce replay cache, input guards)
@@ -396,7 +426,7 @@ Key additions in 3.2.0:
 }
 ```
 
-## EVM Forecast Variant Details (3.2.0)
+## EVM Forecast Variant Details (3.3.0)
 
 The Earned Value report (`reports.earnedValue`) now exposes multiple EAC variants:
 - `cpiBased`: AC + (BAC - EV) / CPI

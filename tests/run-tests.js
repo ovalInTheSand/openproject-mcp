@@ -17,7 +17,8 @@ async function runTest(testFile) {
     console.log(`\n🧪 Running ${testFile}...`);
     console.log('─'.repeat(50));
     
-    const child = spawn('node', [join(__dirname, testFile)], {
+  // Resolve tsx CLI path dynamically (supports ESM). Fallback to global 'npx tsx' semantics if resolution fails.
+  const child = spawn('npx', ['-y', 'tsx', join(__dirname, testFile)], {
       stdio: 'inherit',
       env: { ...process.env }
     });

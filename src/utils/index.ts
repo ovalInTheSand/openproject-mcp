@@ -1,7 +1,6 @@
 // src/utils/index.ts - Centralized exports for utility functions
 
-// Re-export all formatting utilities
-export * from "./format.js";
+// Note: formatting utilities removed as unused; keep exports lean
 
 // Re-export all validation utilities
 export * from "./validation.js";
