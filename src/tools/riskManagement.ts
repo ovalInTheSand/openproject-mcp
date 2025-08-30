@@ -1,6 +1,6 @@
 // src/tools/riskManagement.ts
 import { z } from "zod";
-import { opFetch, joinUrl } from "../util/op.js";
+import { opFetch, joinUrl } from "../util/op";
 
 // ===== RISK MANAGEMENT SCHEMAS =====
 
@@ -232,7 +232,7 @@ export async function performQuantitativeAnalysis(
   input: z.infer<typeof performQuantitativeAnalysisInput>
 ) {
   // Get all risk-related work packages for the project
-  const riskWorkPackagesUrl = joinUrl("/api/v3/work_packages", {
+  const params1: any = {
     filters: JSON.stringify([
       {
         "project": {
@@ -247,10 +247,10 @@ export async function performQuantitativeAnalysis(
         }
       }
     ])
-  });
+  };
 
-  const { json: risksResponse } = await opFetch<any>(ctx.env, riskWorkPackagesUrl);
-  const risks = risksResponse._embedded?.elements || [];
+  const { json: risksResponse } = await opFetch<any>(ctx.env, "/api/v3/work_packages", { params: params1 });
+  const risks = risksResponse?._embedded?.elements || [];
 
   if (risks.length === 0) {
     return {
@@ -344,12 +344,12 @@ export async function trackMitigation(
     ];
   }
 
-  const riskWorkPackagesUrl = joinUrl("/api/v3/work_packages", {
+  const params2: any = {
     filters: JSON.stringify(filterQuery)
-  });
+  };
 
-  const risksResponse = await opFetch(ctx.env, riskWorkPackagesUrl);
-  const risks = risksResponse._embedded?.elements || [];
+  const risksResponse = await opFetch(ctx.env, "/api/v3/work_packages", { params: params2 });
+  const risks = risksResponse.json?._embedded?.elements || [];
 
   const mitigationTracking = {
     trackingPeriod: input.trackingPeriod,
@@ -383,7 +383,7 @@ export async function trackMitigation(
     if (input.includeMitigationTasks) {
       try {
         // Look for work packages that relate to this risk
-        const relatedTasksUrl = joinUrl("/api/v3/relations", {
+        const relParams: any = {
           filters: JSON.stringify([
             {
               "from": {
@@ -392,9 +392,9 @@ export async function trackMitigation(
               }
             }
           ])
-        });
+        };
         
-        const { json: relationsResponse } = await opFetch<any>(ctx.env, relatedTasksUrl);
+        const { json: relationsResponse } = await opFetch<any>(ctx.env, "/api/v3/relations", { params: relParams });
         const relations = relationsResponse._embedded?.elements || [];
 
         for (const relation of relations) {
@@ -436,7 +436,7 @@ export async function trackMitigation(
         riskMitigation.mitigationTasks.length : 0;
       
       const residualRiskScore = riskMitigation.riskScore * ((100 - mitigationProgress) / 100);
-      riskMitigation.residualRisk = {
+      (riskMitigation as any).residualRisk = {
         score: residualRiskScore,
         level: residualRiskScore >= 15 ? "high" : residualRiskScore >= 8 ? "medium" : "low"
       };
@@ -482,7 +482,7 @@ export async function generateRiskBurndown(
   input: z.infer<typeof generateRiskBurndownInput>
 ) {
   // Get all risk work packages with their activity history
-  const riskWorkPackagesUrl = joinUrl("/api/v3/work_packages", {
+  const params4: any = {
     filters: JSON.stringify([
       {
         "project": {
@@ -497,10 +497,10 @@ export async function generateRiskBurndown(
         }
       }
     ])
-  });
+  };
 
-  const { json: risksResponse } = await opFetch<any>(ctx.env, riskWorkPackagesUrl);
-  const risks = risksResponse._embedded?.elements || [];
+  const { json: risksResponse } = await opFetch<any>(ctx.env, "/api/v3/work_packages", { params: params4 });
+  const risks = risksResponse?._embedded?.elements || [];
 
   const burndownData = {
     timeframe: input.timeframe,
@@ -615,7 +615,7 @@ export async function generateRiskBurndown(
     totalRisksRealized: Object.values(distributionData).reduce((sum: number, group: any) => sum + group.realized, 0),
     activeRisks: Object.values(distributionData).reduce((sum: number, group: any) => sum + group.active, 0),
     riskBurnRate: risks.length > 0 ? 
-      (Object.values(distributionData).reduce((sum: number, group: any) => sum + group.closed, 0) / risks.length) * 100 : 0,
+      (Number(Object.values(distributionData).reduce((sum: number, group: any) => sum + (Number(group.closed) || 0), 0)) / Number(risks.length)) * 100 : 0,
     recommendations: generateBurndownRecommendations(distributionData, risks.length)
   };
 
@@ -797,14 +797,14 @@ function generateRiskRecommendations(analysis: any, riskData: any[]): string[] {
 
 function generateBurndownRecommendations(distributionData: any, totalRisks: number): string[] {
   const recommendations = [];
-  const activeRisks = Object.values(distributionData).reduce((sum: number, group: any) => sum + group.active, 0);
-  const closedRisks = Object.values(distributionData).reduce((sum: number, group: any) => sum + group.closed, 0);
+  const activeRisks = Object.values(distributionData).reduce((sum: number, group: any) => sum + (Number(group.active) || 0), 0);
+  const closedRisks = Object.values(distributionData).reduce((sum: number, group: any) => sum + (Number(group.closed) || 0), 0);
   
-  if (activeRisks / totalRisks > 0.7) {
+  if (totalRisks > 0 && Number(activeRisks) / Number(totalRisks) > 0.7) {
     recommendations.push("High number of active risks - accelerate mitigation efforts");
   }
   
-  if (closedRisks / totalRisks < 0.1) {
+  if (totalRisks > 0 && Number(closedRisks) / Number(totalRisks) < 0.1) {
     recommendations.push("Low risk closure rate - review mitigation effectiveness");
   }
   

@@ -1,8 +1,51 @@
-# OpenProject MCP Server
+# OpenProject MCP Server v3.1.0 🚀
 
-A Model Context Protocol (MCP) server that provides comprehensive access to OpenProject APIs for project management workflows. Built for [Claude Code](https://claude.ai/code) and other MCP-compatible clients.
+**Advanced MCP server with hybrid OpenProject API integration, real-time webhooks, enhanced notifications, internal comments, negative lag dependencies, dynamic PMO variables, and AI-powered enterprise analytics**
 
-## Features
+A sophisticated Model Context Protocol (MCP) server that provides comprehensive access to OpenProject APIs with advanced enterprise features. Built for [Claude Code](https://claude.ai/code) and other MCP-compatible clients.
+
+## 🎯 Features
+
+### 🔄 **Hybrid Data Architecture**
+- **Native OpenProject Integration**: Leverages OpenProject's calculated fields and native API
+- **Custom Enterprise Calculator**: PMBOK-compliant EVM, Critical Path, and Resource Analytics
+- **Intelligent Data Fusion**: Combines OpenProject's strengths with advanced PMO calculations
+
+### 🔧 **Dynamic PMO Variables**
+- **Project-Level Customization**: Override organizational defaults per project
+- **Custom Field Storage**: Variables stored as OpenProject custom fields
+- **Validation Policies**: Enforce organizational standards and limits
+- **User-Specific Rates**: Support for user-specific labor rates and preferences
+
+### 🗄️ **Intelligent Caching System**
+- **SQLite-based Performance**: Fast caching with TTL expiration
+- **Smart Cache Strategies**: Different TTL policies for different data types
+- **Performance Monitoring**: Hit rates, memory usage, and health metrics
+- **Cache Warming**: Pre-load frequently accessed data
+
+### 🔄 **Real-time Integration**
+- **Webhooks Support**: Real-time notifications for work package changes, comments, and time entries
+- **Notification Filtering**: Filter by reason (mentioned, assigned, etc.) with OpenProject API
+- **Internal Comments**: Secure team discussions with Capabilities API permission checking
+- **Negative Lag Dependencies**: Work packages can start before predecessors finish
+
+### ⚡ **Performance Optimizations**
+- **Request Compression**: gzip/deflate support for faster API responses
+- **Two-level Relation Structure**: Organized UI following OpenProject design patterns
+- **Webhook Delivery Monitoring**: Performance statistics and health tracking
+
+### 🧰 **40 Advanced MCP Tools**
+- **hybrid.*** - Project data with native + custom calculations  
+- **variables.*** - PMO variable management and validation
+- **cache.*** - Cache performance and management
+- **analytics.*** - EVM analysis with benchmarking
+- **system.*** - System health and diagnostics
+- **notifications.*** - Notification filtering and reminders (5 tools)
+- **comments.*** - Internal comments with security validation (5 tools) 
+- **webhooks.*** - Real-time integration and monitoring (7 tools)
+- **dependencies.*** - Negative lag and relation structure management
+
+## Tool Categories
 
 ### 🎯 **Core Project Management Tools (14 Basic Tools)**
 - **Projects**: List and filter projects by name/identifier
@@ -93,7 +136,45 @@ npm run dev
      -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
    ```
 
-## Available Tools (54 Total)
+## Available Tools (72 Total)
+
+### 🔄 **Real-time & Communication Tools**
+
+#### Notifications (5 tools)
+| Tool | Description | Key Features |
+|------|-------------|-------------|
+| `notifications.list` | List notifications with advanced filtering | Filter by reason (mentioned, assigned, etc.) |
+| `notifications.markRead` | Mark notifications as read | Individual or bulk operations |
+| `notifications.getSettings` | Get user notification preferences | Capabilities checking |
+| `notifications.createReminder` | Create work package reminders | OpenProject reminders feature |
+| `notifications.getStats` | Notification analytics | Performance metrics |
+
+#### Internal Comments (5 tools)
+| Tool | Description | Key Features |
+|------|-------------|-------------|
+| `comments.checkCapabilities` | Check comment permissions | Capabilities API integration |
+| `comments.addInternal` | Add internal comments | Team-only security |
+| `comments.list` | List comments with filtering | Internal/public separation |
+| `comments.update` | Update comments | Permission validation |
+| `comments.delete` | Delete comments | Authorization checking |
+
+#### Real-time Webhooks (7 tools)
+| Tool | Description | Key Features |
+|------|-------------|-------------|
+| `webhooks.create` | Create webhook subscriptions | Event filtering, project scoping |
+| `webhooks.list` | List webhook configurations | Status and event tracking |
+| `webhooks.update` | Update webhook settings | Dynamic reconfiguration |
+| `webhooks.delete` | Remove webhook subscriptions | Clean removal |
+| `webhooks.test` | Test webhook delivery | Connectivity validation |
+| `webhooks.getLogs` | Get delivery statistics | Performance monitoring |
+| `webhooks.validateSignature` | Validate webhook security | HMAC-SHA256 verification |
+
+#### Dependency Management
+| Tool | Description | Key Features |
+|------|-------------|-------------|
+| `dependencies.manageStructure` | Manage relation structure | Negative lag, two-level UI organization |
+
+### 📊 **Core & Hybrid Tools**
 
 ### Core Operations
 | Tool | Description | Required Parameters |
@@ -198,6 +279,63 @@ npm run dev
 
 ## Examples
 
+### Real-time Webhook Setup
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "tools/call",
+  "params": {
+    "name": "webhooks.create",
+    "arguments": {
+      "name": "MCP Real-time Updates",
+      "url": "https://your-mcp-server.com/webhook",
+      "events": ["work_package:updated", "work_package:commented", "time_entry:created"],
+      "secret": "your-webhook-secret",
+      "projects": [1, 2, 3]
+    }
+  }
+}
+```
+
+### Notification Filtering
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "method": "tools/call",
+  "params": {
+    "name": "notifications.list",
+    "arguments": {
+      "filters": [
+        {"reason": "mentioned"},
+        {"readIAN": false},
+        {"dateRange": {"from": "2025-01-01T00:00:00Z", "to": "2025-08-30T23:59:59Z"}}
+      ],
+      "sortBy": [["createdAt", "desc"]]
+    }
+  }
+}
+```
+
+### Internal Comment with Security
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 3,
+  "method": "tools/call",
+  "params": {
+    "name": "comments.addInternal",
+    "arguments": {
+      "workPackageId": 123,
+      "comment": "Internal team discussion about implementation approach",
+      "internal": true,
+      "notifyWatchers": false
+    }
+  }
+}
+```
+
 ### Create a Work Package
 ```json
 {
@@ -260,6 +398,48 @@ npm run dev
 npm run deploy
 
 # Set production environment variables
+
+## Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| OP_BASE_URL | (required) | OpenProject base URL |
+| OP_TOKEN | (required) | OpenProject API key |
+| ALLOWED_ORIGINS |  | Comma-separated CORS origins |
+| SSE_ENABLED | false | Enable SSE endpoint |
+| MCP_RATE_LIMIT | 200 | Requests per window per IP |
+| MCP_RATE_WINDOW_MS | 60000 | Rate limit window (ms) |
+| MCP_MAX_BODY_BYTES | 524288 | Max JSON body bytes |
+| MCP_TOOL_TIMEOUT_MS | 15000 | Default tool timeout (ms) |
+| MCP_TOOL_TIMEOUT_MAP |  | JSON map tool->timeout (<=60000) |
+| MCP_MAX_ARRAY_ITEMS | 200 | Input guard: max array length |
+| MCP_MAX_STRING_LENGTH | 5000 | Input guard: max string length |
+| MCP_MAX_NESTING_DEPTH | 8 | Input guard: max object depth |
+| MCP_MAX_FILTERS | 25 | Input guard: max filters entries |
+| MCP_EGRESS_ALLOW |  | Extra outbound hosts |
+| MCP_SERVER_TOKEN |  | Shared-secret auth via x-mcp-auth |
+| MCP_HMAC_SECRET |  | Enable HMAC signing verification |
+| MCP_HMAC_MAX_SKEW_SEC | 300 | Allowed timestamp skew (sec) |
+| MCP_HMAC_NONCE_CACHE_SIZE | 1000 | Nonce replay cache size |
+| MCP_IP_HASH_SALT |  | Hash IPs in logs for privacy |
+
+## Capability Discovery
+
+```json
+{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"system.getCapabilities","arguments":{}}}
+```
+
+## Metrics
+
+```json
+{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"system.getMetrics","arguments":{}}}
+```
+
+## HMAC Signing
+
+Canonical string: `timestamp.nonce.rawBody`
+Headers required when enabled: `x-mcp-signature: v1=<hex>`, `x-mcp-timestamp`, `x-mcp-nonce`
+
 npx wrangler secret put OP_BASE_URL
 npx wrangler secret put OP_TOKEN
 ```

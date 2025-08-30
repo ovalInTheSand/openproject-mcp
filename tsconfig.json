@@ -8,7 +8,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "noImplicitAny": false,
-    "noImplicitThis": false,
+    "noImplicitThis": true,
     "noImplicitReturns": false,
     "strictNullChecks": false,
     "strictFunctionTypes": false,

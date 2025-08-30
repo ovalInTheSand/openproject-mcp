@@ -150,6 +150,9 @@ export function validateInput<T>(
   } catch (error) {
     if (error instanceof z.ZodError) {
       const firstIssue = error.issues[0];
+      if (!firstIssue) {
+        throw new ValidationError("Unknown validation error", "", "unknown");
+      }
       const field = firstIssue.path.join(".");
       const message = `${field ? `${field}: ` : ""}${firstIssue.message}`;
       throw new ValidationError(
@@ -190,8 +193,8 @@ export function validatePagination(input: any): {
   );
   
   return {
-    pageSize: result.pageSize,
-    offset: result.offset
+    pageSize: result.pageSize || 100,
+    offset: result.offset || 0
   };
 }
 

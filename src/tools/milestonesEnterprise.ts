@@ -329,7 +329,7 @@ export async function processPhaseGate({ env }: Ctx, input: z.infer<typeof proce
   enterpriseMetadata.lastApprovalAction = approvalRecord;
 
   // Update milestone
-  const updatePayload = {
+  const updatePayload: any = {
     status: newStatus,
     customField1: JSON.stringify(enterpriseMetadata),
   };

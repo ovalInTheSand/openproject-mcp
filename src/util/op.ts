@@ -1,4 +1,5 @@
 // src/util/op.ts
+import { VERSION } from "../constants/version";
 
 export type Json = Record<string, unknown> | unknown[] | string | number | boolean | null;
 
@@ -60,8 +61,15 @@ function scrubHeaders(h: HeadersInit | undefined): HeadersInit | undefined {
 function baseAuthHeader(token: string): string {
   // OpenProject API uses Basic with username 'apikey' and the API key as password.
   const raw = `apikey:${token}`;
-  // btoa is available in Workers runtime
-  return "Basic " + btoa(raw);
+  // Use TextEncoder for safe UTF-8 to base64 conversion
+  try {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(raw);
+    const binaryString = String.fromCharCode(...data);
+    return "Basic " + btoa(binaryString);
+  } catch (error) {
+    throw new Error(`Failed to encode authentication header: ${error instanceof Error ? error.message : String(error)}`);
+  }
 }
 
 export type FetchOptions = {
@@ -87,11 +95,28 @@ export async function opFetch<T = any>(
   const token = env.OP_TOKEN?.trim();
   if (!token) throw new Error("OP_TOKEN not configured");
 
+  // Egress allowlist: default allow only OP_BASE_URL host; can extend via MCP_EGRESS_ALLOW (comma list)
+  try {
+    const allowEnv = (globalThis as any).ENV?.MCP_EGRESS_ALLOW || (env as any).MCP_EGRESS_ALLOW;
+    const allowHosts = [new URL(base).host, ...(allowEnv ? String(allowEnv).split(',').map((s) => s.trim()).filter(Boolean) : [])];
+    // If path is absolute URL ensure it's in allowlist
+    if (/^https?:\/\//i.test(path)) {
+      const host = new URL(path).host;
+      if (!allowHosts.includes(host)) {
+        throw new Error(`egress_blocked: host ${host} not in allowlist`);
+      }
+    }
+  } catch (egressErr) {
+    if (egressErr instanceof Error && egressErr.message.startsWith('egress_blocked')) throw egressErr;
+    // If URL parsing fails, continue; downstream will surface meaningful errors.
+  }
+
   const url = joinUrl(base, withQuery(path, opts.params));
   const headers = new Headers({
     Accept: "application/hal+json; charset=utf-8",
+    "Accept-Encoding": "gzip, deflate, br",
     Authorization: baseAuthHeader(token),
-    "User-Agent": "openproject-mcp/0.3.0 (+mcp)",
+  "User-Agent": `openproject-mcp/${VERSION} (+mcp +webhooks +realtime)`,
   });
 
   // Merge provided headers (but keep our Authorization)

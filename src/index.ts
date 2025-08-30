@@ -2,6 +2,7 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { StreamableHTTPTransport } from "@hono/mcp";
+import { securityMiddleware, trackSseConnection } from './middleware/security';
 import { buildServer } from "./server";
 import { handleSSEConnection } from "./sse";
 
@@ -19,16 +20,24 @@ const app = new Hono<{ Bindings: Bindings }>();
 // CORS: allow inspector origins + mcp-session-id header + SSE headers
 const corsConfig = {
   origin: (origin: string | undefined, c: any) => {
-    const allow = c.env.ALLOWED_ORIGINS?.split(",").map((s: string) => s.trim()).filter(Boolean) ?? [];
-    if (!origin) return allow.length ? allow[0] : "*";
-    return allow.includes(origin) ? origin : "";
+    const allow = c.env.ALLOWED_ORIGINS?.split(',').map((s: string) => s.trim()).filter(Boolean) ?? [];
+    if (!allow.length) return '';
+    if (!origin) return allow[0];
+    return allow.includes(origin) ? origin : '';
   },
-  allowHeaders: ["Content-Type", "mcp-session-id", "Last-Event-ID", "Cache-Control"],
+  allowHeaders: ["Content-Type", "mcp-session-id", "Last-Event-ID", "Cache-Control", "x-mcp-auth"],
   allowMethods: ["GET", "POST", "DELETE", "OPTIONS"],
   exposeHeaders: ["Content-Type", "Cache-Control"],
 };
 
 app.use("/mcp", cors(corsConfig));
+// Phase 2 security middleware (rate limit, headers, size limit, optional auth)
+app.use('*', securityMiddleware({
+  requestsPerWindow: 200,
+  windowMs: 60_000,
+  maxBodyBytes: 512 * 1024,
+  requireAuthHeader: false
+}));
 
 // Optional SSE route (disabled by default per project philosophy)
 app.use("/sse", cors(corsConfig));
@@ -46,11 +55,15 @@ app.get("/sse", async (c) => {
   // Set global ENV for this request context
   (globalThis as any).ENV = c.env;
 
-  return handleSSEConnection(c);
+  return trackSseConnection(() => handleSSEConnection(c), 25).catch(() => c.json({ error: 'too_many_sse_connections' }, 429));
 });
 
 // MCP route using our modular server (primary transport)
 app.all("/mcp", async (c) => {
+  // Enforce JSON-RPC over POST; return consistent 405 for other methods (improves test stability vs ambiguous 406)
+  if (c.req.method !== 'POST') {
+    return c.json({ error: 'Method Not Allowed', allowed: ['POST'] }, 405);
+  }
   const transport = new StreamableHTTPTransport();
   const server = buildServer();
 

@@ -66,6 +66,11 @@ async function main() {
     process.exit(1);
   }
   
+  // Optionally include live atomic validation when env flag set
+  if (process.env.MCP_LIVE_VALIDATION === 'true') {
+    testFiles.push('live-atomic-validation.js');
+  }
+
   if (testFiles.length === 0) {
     console.log('❌ No test files found');
     process.exit(1);

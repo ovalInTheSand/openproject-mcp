@@ -1,5 +1,7 @@
 // src/server.ts
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { getMetricsSnapshot, observeToolLatency, recordToolCall } from './observability/metrics.js';
+import { VERSION } from "./constants/version";
 import { z } from "zod";
 import {
   listProjects,
@@ -26,6 +28,35 @@ import { listStatuses, listStatusesInput } from "./tools/statuses";
 import { listPriorities, listPrioritiesInput } from "./tools/priorities";
 import { listVersions, listVersionsInput } from "./tools/versions";
 import { searchUsers, searchUsersInput, getCurrentUser, getCurrentUserInput } from "./tools/users";
+
+// Import enhanced notification tools
+import { 
+  listNotifications, listNotificationsInput,
+  markNotificationsRead, markNotificationsReadInput,
+  getNotificationSettings, getNotificationSettingsInput,
+  createReminder, createReminderInput,
+  getNotificationStats, getNotificationStatsInput
+} from "./tools/notifications";
+
+// Import enhanced comments tools
+import {
+  checkCommentCapabilities, checkCommentCapabilitiesInput,
+  addInternalComment, addInternalCommentInput,
+  listComments, listCommentsInput,
+  updateComment, updateCommentInput,
+  deleteComment, deleteCommentInput
+} from "./tools/comments";
+
+// Import webhooks tools
+import {
+  createWebhook, createWebhookInput,
+  listWebhooks, listWebhooksInput,
+  updateWebhook, updateWebhookInput,
+  deleteWebhook, deleteWebhookInput,
+  testWebhook, testWebhookInput,
+  getWebhookLogs, getWebhookLogsInput,
+  validateWebhookSignature, validateWebhookSignatureInput
+} from "./tools/webhooks";
 
 // Import enterprise tool modules
 import { 
@@ -60,7 +91,8 @@ import {
   createDependency, createDependencyInput,
   updateDependency, updateDependencyInput,
   analyzeDependencies, analyzeDependenciesInput,
-  removeDependency, removeDependencyInput
+  removeDependency, removeDependencyInput,
+  manageRelationStructure, manageRelationStructureInput
 } from "./tools/dependenciesEnterprise";
 
 import {
@@ -97,6 +129,25 @@ import {
   trackProgramBenefits, trackProgramBenefitsInput,
   manageProgramStakeholders, manageProgramStakeholdersInput
 } from "./tools/programManagement";
+
+// Import hybrid tools for v3.0.0 dynamic PMO functionality
+import {
+  getProjectData, getProjectDataInput,
+  getProjectStatus, getProjectStatusInput,
+  getPortfolioAnalytics, getPortfolioAnalyticsInput,
+  getProjectVariables, getProjectVariablesInput,
+  setProjectVariables, setProjectVariablesInput,
+  getOrganizationalDefaults, getOrganizationalDefaultsInput,
+  setOrganizationalDefaults, setOrganizationalDefaultsInput,
+  getUserVariables, getUserVariablesInput,
+  getMultipleProjectsData, getMultipleProjectsDataInput,
+  getCachePerformance, getCachePerformanceInput,
+  clearProjectCache, clearProjectCacheInput,
+  warmCache, warmCacheInput,
+  exportProjectVariables, exportProjectVariablesInput,
+  analyzeEVMWithBenchmark, analyzeEVMWithBenchmarkInput,
+  getSystemHealth, getSystemHealthInput
+} from "./tools/hybridTools";
 
 // ---------- helper types ----------
 type InferInput<T> =
@@ -139,6 +190,19 @@ const toPretty = (v: unknown) => {
 //  - always supplies a field-map inputSchema (SDK-friendly across versions)
 //  - returns { content: [...], structuredContent } on success
 //  - returns { isError: true, ... } on failure
+// Tool execution timeout helper
+async function withTimeout<T>(promise: Promise<T>, ms: number, name: string): Promise<T> {
+  let timer: any;
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error(`tool_timeout: ${name} exceeded ${ms}ms`)), ms);
+  });
+  try {
+    return await Promise.race([promise, timeout]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 function registerToolHelper<
   T extends z.AnyZodObject | Record<string, z.ZodTypeAny>
 >(
@@ -165,19 +229,24 @@ function registerToolHelper<
         {};
 
       try {
-        // ✅ pass TWO args to your handlers: (ctx, input)
         const typedInput = input as InferInput<T>;
-        const result = await handler({ env }, typedInput);
-
+        const execTimeout = perToolTimeout(name, env);
+        const t0 = Date.now();
+        const result = await withTimeout(handler({ env }, typedInput), execTimeout, name);
+        observeToolLatency(name, Date.now() - t0);
+        recordToolCall(name, 'success');
         return {
           content: [{ type: "text", text: toPretty(result) }],
           structuredContent: result,
         };
       } catch (e: any) {
+        const isTimeout = /tool_timeout/.test(e?.message || '');
+        recordToolCall(name, isTimeout ? 'timeout' : 'error');
         const status = e?.status ?? e?.code ?? undefined;
         const body = e?.body ?? undefined;
         const msg = e?.message ? String(e.message) : "Tool execution failed";
-        const errJson = { message: msg, status, body };
+        const code = isTimeout ? 'tool_timeout' : (e?.code || 'upstream_error');
+        const errJson = { code, message: msg, status, body };
         return {
           content: [{ type: "text", text: `Error: ${msg}\n${toPretty(errJson)}` }],
           structuredContent: errJson,
@@ -188,11 +257,22 @@ function registerToolHelper<
   );
 }
 
+function perToolTimeout(tool: string, env: any): number {
+  const base = parseInt(env?.MCP_TOOL_TIMEOUT_MS || '15000', 10) || 15000;
+  const raw = env?.MCP_TOOL_TIMEOUT_MAP;
+  if (!raw) return base;
+  try {
+    const map = JSON.parse(raw);
+    const v = map[tool];
+    if (Number.isFinite(v) && v > 0 && v <= 60000) return v;
+  } catch {}
+  return base;
+}
+
 export function buildServer() {
   const server = new McpServer({
     name: "openproject-mcp",
-    version: "2.0.0", // Phase 2: Advanced PM Capabilities
-    // instructions: "Comprehensive enterprise project management tools with portfolio, risk, predictive analytics, and program management."
+    version: VERSION,
   });
 
   // Health check
@@ -287,6 +367,111 @@ export function buildServer() {
     "Get current authenticated user info.",
     getCurrentUserInput,
     getCurrentUser,
+  );
+
+  // Enhanced Notifications (OpenProject 2024-2025 features)
+  registerToolHelper(server, "notifications.list",
+    "List notifications with enhanced filtering by reason, project, date range, and read status.",
+    listNotificationsInput,
+    listNotifications,
+  );
+
+  registerToolHelper(server, "notifications.markRead",
+    "Mark specific notifications or all notifications as read.",
+    markNotificationsReadInput,
+    markNotificationsRead,
+  );
+
+  registerToolHelper(server, "notifications.getSettings",
+    "Get notification preferences and capabilities for a user.",
+    getNotificationSettingsInput,
+    getNotificationSettings,
+  );
+
+  registerToolHelper(server, "notifications.createReminder",
+    "Create work package reminders with notification options (OpenProject 15.2+).",
+    createReminderInput,
+    createReminder,
+  );
+
+  registerToolHelper(server, "notifications.getStats",
+    "Get notification statistics and analytics for a date range.",
+    getNotificationStatsInput,
+    getNotificationStats,
+  );
+
+  // Enhanced Comments with Internal Support (OpenProject 2024-2025 features)
+  registerToolHelper(server, "comments.checkCapabilities",
+    "Check comment capabilities and permissions for a work package using Capabilities API.",
+    checkCommentCapabilitiesInput,
+    checkCommentCapabilities,
+  );
+
+  registerToolHelper(server, "comments.addInternal",
+    "Add internal comment to work package with proper permission checking.",
+    addInternalCommentInput,
+    addInternalComment,
+  );
+
+  registerToolHelper(server, "comments.list",
+    "List work package comments with internal/public filtering and permission checking.",
+    listCommentsInput,
+    listComments,
+  );
+
+  registerToolHelper(server, "comments.update",
+    "Update/edit a comment if user has permission.",
+    updateCommentInput,
+    updateComment,
+  );
+
+  registerToolHelper(server, "comments.delete",
+    "Delete a comment if user has permission.",
+    deleteCommentInput,
+    deleteComment,
+  );
+
+  // Real-time Webhooks Integration (OpenProject 2024-2025 features)
+  registerToolHelper(server, "webhooks.create",
+    "Create webhook for real-time OpenProject event notifications.",
+    createWebhookInput,
+    createWebhook,
+  );
+
+  registerToolHelper(server, "webhooks.list",
+    "List configured webhooks with filtering options.",
+    listWebhooksInput,
+    listWebhooks,
+  );
+
+  registerToolHelper(server, "webhooks.update",
+    "Update webhook configuration (URL, events, filters).",
+    updateWebhookInput,
+    updateWebhook,
+  );
+
+  registerToolHelper(server, "webhooks.delete",
+    "Delete webhook configuration.",
+    deleteWebhookInput,
+    deleteWebhook,
+  );
+
+  registerToolHelper(server, "webhooks.test",
+    "Test webhook delivery and connectivity.",
+    testWebhookInput,
+    testWebhook,
+  );
+
+  registerToolHelper(server, "webhooks.getLogs",
+    "Get webhook delivery logs and performance statistics.",
+    getWebhookLogsInput,
+    getWebhookLogs,
+  );
+
+  registerToolHelper(server, "webhooks.validateSignature",
+    "Validate incoming webhook signatures for security.",
+    validateWebhookSignatureInput,
+    validateWebhookSignature,
   );
 
   // === ENTERPRISE PROJECT MANAGEMENT TOOLS ===
@@ -416,6 +601,12 @@ export function buildServer() {
     removeDependency,
   );
 
+  registerToolHelper(server, "dependencies.manageStructure",
+    "Manage work package relations using OpenProject 2024-2025 two-level structure with negative lag support.",
+    manageRelationStructureInput,
+    manageRelationStructure,
+  );
+
   // Enterprise Reporting & Analytics
   registerToolHelper(server, "reports.earnedValue",
     "Generate earned value management (EVM) reports with PMBOK standard calculations.",
@@ -536,6 +727,142 @@ export function buildServer() {
     manageProgramStakeholdersInput,
     manageProgramStakeholders,
   );
+
+  // === v3.0.0 HYBRID DATA & DYNAMIC VARIABLES TOOLS ===
+  
+  // Hybrid Project Data Access
+  registerToolHelper(server, "hybrid.getProjectData",
+    "Get comprehensive project data using hybrid OpenProject native + custom calculations.",
+    getProjectDataInput,
+    getProjectData,
+  );
+  
+  registerToolHelper(server, "hybrid.getProjectStatus",
+    "Get real-time project status (never cached) with alerts and upcoming deadlines.",
+    getProjectStatusInput,
+    getProjectStatus,
+  );
+  
+  registerToolHelper(server, "hybrid.getMultipleProjectsData",
+    "Get data for multiple projects efficiently with intelligent caching.",
+    getMultipleProjectsDataInput,
+    getMultipleProjectsData,
+  );
+  
+  // Portfolio Analytics
+  registerToolHelper(server, "hybrid.getPortfolioAnalytics",
+    "Get comprehensive portfolio analytics with resource conflicts and recommendations.",
+    getPortfolioAnalyticsInput,
+    getPortfolioAnalytics,
+  );
+  
+  // PMO Variable Management
+  registerToolHelper(server, "variables.getProjectVariables",
+    "Get PMO variables for a specific project (combines defaults + overrides).",
+    getProjectVariablesInput,
+    getProjectVariables,
+  );
+  
+  registerToolHelper(server, "variables.setProjectVariables",
+    "Set PMO variables for a project with validation and policy checking.",
+    setProjectVariablesInput,
+    setProjectVariables,
+  );
+  
+  registerToolHelper(server, "variables.getOrganizationalDefaults",
+    "Get organizational default PMO variables.",
+    getOrganizationalDefaultsInput,
+    getOrganizationalDefaults,
+  );
+  
+  registerToolHelper(server, "variables.setOrganizationalDefaults",
+    "Set organizational default PMO variables.",
+    setOrganizationalDefaultsInput,
+    setOrganizationalDefaults,
+  );
+  
+  registerToolHelper(server, "variables.getUserVariables",
+    "Get user-specific variables (rates, preferences, skill level, etc.).",
+    getUserVariablesInput,
+    getUserVariables,
+  );
+  
+  registerToolHelper(server, "variables.export",
+    "Export PMO variables for backup or migration purposes.",
+    exportProjectVariablesInput,
+    exportProjectVariables,
+  );
+  
+  // Cache Management
+  registerToolHelper(server, "cache.getPerformance",
+    "Get cache performance statistics and health information.",
+    getCachePerformanceInput,
+    getCachePerformance,
+  );
+  
+  registerToolHelper(server, "cache.clearProject",
+    "Clear cached data for a specific project.",
+    clearProjectCacheInput,
+    clearProjectCache,
+  );
+  
+  registerToolHelper(server, "cache.warm",
+    "Pre-warm cache for frequently accessed projects.",
+    warmCacheInput,
+    warmCache,
+  );
+  
+  // Enhanced Analytics
+  registerToolHelper(server, "analytics.evmWithBenchmark",
+    "Analyze EVM performance with benchmark comparison and industry standards.",
+    analyzeEVMWithBenchmarkInput,
+    analyzeEVMWithBenchmark,
+  );
+  
+  // System Health
+  registerToolHelper(server, "system.getHealth",
+    "Get comprehensive system health including cache performance and feature status.",
+    getSystemHealthInput,
+    getSystemHealth,
+  );
+
+  registerToolHelper(server, 'system.getCapabilities', 'Get server capabilities, limits, and feature flags.', z.object({}), async ({ env }) => {
+    const extra = (env as any)?.MCP_EGRESS_ALLOW;
+    const baseHost = new URL(env.OP_BASE_URL).host;
+    const allowedHosts = [baseHost, ...(extra ? String(extra).split(',').map((s)=>s.trim()).filter(Boolean) : [])];
+    return {
+      name: 'openproject-mcp', version: VERSION, protocolRevision: '2025-06-18',
+      toolCount: (server as any).tools?.size || undefined,
+      features: { sse: true, webhooks: true, hybridData: true, enterprise: true, predictiveAnalytics: true },
+      limits: {
+        rateLimit: parseInt((env as any)?.MCP_RATE_LIMIT || '200',10),
+        rateWindowMs: parseInt((env as any)?.MCP_RATE_WINDOW_MS || '60000',10),
+        maxBodyBytes: parseInt((env as any)?.MCP_MAX_BODY_BYTES || String(512*1024),10),
+        defaultToolTimeoutMs: parseInt((env as any)?.MCP_TOOL_TIMEOUT_MS || '15000',10),
+        sseMaxConnections: 25,
+        maxArrayItems: parseInt((env as any)?.MCP_MAX_ARRAY_ITEMS || '200',10),
+        maxStringLength: parseInt((env as any)?.MCP_MAX_STRING_LENGTH || '5000',10),
+        maxFilters: parseInt((env as any)?.MCP_MAX_FILTERS || '25',10)
+      },
+      security: { rateLimiting: true, bodyLimit: true, egressAllowlist: true, timeouts: true, sseCap: true, hmacEnabled: !!(env as any)?.MCP_HMAC_SECRET, ipPrivacy: !!(env as any)?.MCP_IP_HASH_SALT },
+      egress: { allowedHosts }
+    };
+  });
+
+  // Tool listing (introspection) for validation/diagnostics
+  registerToolHelper(server, 'system.listTools', 'List registered tool names.', z.object({}), async () => {
+    let names: string[] = [];
+    const raw = (server as any).tools;
+    if (raw) {
+      if (typeof raw.keys === 'function') names = Array.from(raw.keys());
+      else if (Array.isArray(raw)) names = raw.map((t: any)=>String(t?.name||''));
+      else if (typeof raw === 'object') names = Object.keys(raw);
+    }
+    names = names.filter(Boolean).sort();
+    return { tools: names, count: names.length };
+  });
+
+  registerToolHelper(server, 'system.getMetrics', 'Get in-memory metrics counters.', z.object({}), async () => getMetricsSnapshot());
 
   return server;
 }

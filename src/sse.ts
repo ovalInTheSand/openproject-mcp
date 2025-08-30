@@ -9,6 +9,7 @@ interface SSEConnection {
   filters: SSEFilters;
   lastEventId?: string;
   isActive: boolean;
+  send: (payload: string) => boolean; // push event to client
 }
 
 // SSE Event filters
@@ -39,6 +40,7 @@ interface SSEEvent {
 
 // Global connection store (in production, use Redis or similar)
 const connections = new Map<string, SSEConnection>();
+const encoder = new TextEncoder();
 let eventCounter = 0;
 
 // SSE subscription schema
@@ -78,12 +80,23 @@ export async function handleSSEConnection(c: Context): Promise<Response> {
   // Create readable stream for SSE
   const stream = new ReadableStream({
     start(controller) {
+      let controllerOpen = true;
       const connection: SSEConnection = {
         id: connectionId,
         context: c,
         filters,
         lastEventId,
-        isActive: true
+        isActive: true,
+        send: (payload: string) => {
+          if (!controllerOpen) return false;
+          try {
+            controller.enqueue(encoder.encode(payload));
+            return true;
+          } catch {
+            controllerOpen = false;
+            return false;
+          }
+        }
       };
 
       // Store connection
@@ -97,7 +110,7 @@ export async function handleSSEConnection(c: Context): Promise<Response> {
         timestamp: new Date().toISOString()
       });
       
-      controller.enqueue(new TextEncoder().encode(initEvent));
+  connection.send(initEvent);
 
       // Send missed events if lastEventId provided
       if (lastEventId) {
@@ -108,7 +121,7 @@ export async function handleSSEConnection(c: Context): Promise<Response> {
           data: { message: 'Replay not implemented in demo', lastEventId },
           timestamp: new Date().toISOString()
         });
-        controller.enqueue(new TextEncoder().encode(missedEvent));
+  connection.send(missedEvent);
       }
 
       // Setup heartbeat to prevent connection timeout
@@ -121,12 +134,7 @@ export async function handleSSEConnection(c: Context): Promise<Response> {
             timestamp: new Date().toISOString()
           });
           
-          try {
-            controller.enqueue(new TextEncoder().encode(heartbeat));
-          } catch (error) {
-            // Connection closed
-            cleanup();
-          }
+          if (!connection.send(heartbeat)) cleanup();
         } else {
           cleanup();
         }
@@ -137,11 +145,8 @@ export async function handleSSEConnection(c: Context): Promise<Response> {
         connection.isActive = false;
         connections.delete(connectionId);
         clearInterval(heartbeatInterval);
-        try {
-          controller.close();
-        } catch (error) {
-          // Controller already closed
-        }
+  try { controller.close(); } catch {}
+  controllerOpen = false;
       };
 
       // Handle client disconnect
@@ -164,25 +169,15 @@ export async function handleSSEConnection(c: Context): Promise<Response> {
  * Broadcast event to all matching connections
  */
 export function broadcastSSEEvent(event: SSEEvent): void {
-  const eventMessage = formatSSEEvent(event);
-  const eventData = new TextEncoder().encode(eventMessage);
-
+  const message = formatSSEEvent(event);
   connections.forEach((connection) => {
     if (!connection.isActive) {
       connections.delete(connection.id);
       return;
     }
-
-    // Apply filters
-    if (!eventMatchesFilters(event, connection.filters)) {
-      return;
-    }
-
-    try {
-      // In production, you'd need access to the stream controller
-      // This is a simplified implementation
-      console.log(`Broadcasting to connection ${connection.id}:`, eventMessage);
-    } catch (error) {
+    if (!eventMatchesFilters(event, connection.filters)) return;
+    const ok = connection.send(message);
+    if (!ok) {
       connection.isActive = false;
       connections.delete(connection.id);
     }

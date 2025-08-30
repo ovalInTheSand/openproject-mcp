@@ -113,3 +113,58 @@ This project follows enterprise security best practices including:
 
 **Last Updated:** $(date)
 **Reviewed By:** [Maintainer Name]
+
+---
+
+## Runtime Security Controls (MCP Server v3 Hardening)
+
+The server implements multiple layers of runtime security. Verify these are configured appropriately for deployment:
+
+### Rate Limiting
+- Env Vars: `MCP_RATE_LIMIT` (default 200), `MCP_RATE_WINDOW_MS` (default 60000)
+- 429 responses include `Retry-After` header in seconds and JSON body with `retryAfterMs`.
+
+### Request Body Limits
+- Env Var: `MCP_MAX_BODY_BYTES` (default 524288 = 512KB)
+- 413 response on breach: `{ error: 'payload_too_large', limit }`.
+
+### Authentication (Optional)
+- Env Var: `MCP_SERVER_TOKEN` enables shared-secret check on all requests via `x-mcp-auth` header.
+
+### Egress Allowlist
+- Env Var: `MCP_EGRESS_ALLOW` adds comma-delimited extra hostnames.
+- Always allowed: host of `OP_BASE_URL`.
+- Disallowed absolute URLs throw `egress_blocked: host <host> not in allowlist` early.
+
+### Tool Execution Timeouts
+- Env Var: `MCP_TOOL_TIMEOUT_MS` (default 15000).
+- Exceeding timeout raises `tool_timeout: <tool> exceeded <ms>ms`.
+
+### SSE Connection Cap
+- Hardcoded current cap: 25 concurrent connections per instance.
+- Exceeding returns 429 JSON `{ error: 'too_many_sse_connections' }`.
+
+### Structured Access Logging
+- Redacted, minimal fields: `{ e, m, p, ip, s, ms }`.
+- No sensitive input arguments logged.
+
+### Input Size / Future Guards (Planned)
+- Add specific array length / string length guards for high-volume inputs (filters, lists of IDs) as usage patterns emerge.
+
+### Headers Hardened
+- `X-Content-Type-Options: nosniff`
+- `Referrer-Policy: no-referrer`
+- `X-Frame-Options: DENY`
+- `Permissions-Policy: geolocation=(), camera=(), microphone=()`
+- `Cache-Control: no-store`
+- Strict CSP for API responses.
+
+### Retry Semantics
+- 429 includes `Retry-After` header for client backoff orchestration.
+
+### Open Issues / Next Steps
+- Optional HMAC signature for higher-integrity S2S flows.
+- IP hashing (salted) for privacy-preserving analytics.
+- Centralized distributed rate limit store if multi-instance scaling required.
+
+---

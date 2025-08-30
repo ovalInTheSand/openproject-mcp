@@ -14,6 +14,7 @@
 
 import { test } from 'node:test';
 import { strictEqual, ok, deepStrictEqual } from 'node:assert';
+import { parseMcpFetchResponse } from './_helpers/mcpResponse.js';
 
 const MCP_ENDPOINT = process.env.MCP_ENDPOINT || 'http://localhost:8788/mcp';
 
@@ -32,13 +33,13 @@ async function mcpCall(method, name, args = {}) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Accept': 'application/json'
+      'Accept': 'application/json, text/event-stream'
     },
     body: JSON.stringify(request)
   });
 
   ok(response.ok, `MCP call failed with status: ${response.status}`);
-  return await response.json();
+  return await parseMcpFetchResponse(response);
 }
 
 /**
@@ -490,8 +491,9 @@ test('Advanced EVM Scenarios - Multiple EAC Calculation Methods', async (t) => {
   const SPI1 = scenario1.EV / scenario1.PV; // 60000/80000 = 0.75
   
   // EAC Method 1: Current performance continues (CPI-based)
-  const EAC1_method1 = scenario1.BAC / CPI1; // 200000/0.667 = 299,850
-  assertAlmostEqual(EAC1_method1, 299850, 100, 'EAC Method 1 - CPI based');
+  const EAC1_method1 = scenario1.BAC / CPI1; // 200000/0.666666... = 300,000 (full precision)
+  // Using full precision CPI avoids rounding-induced understatement (~150 difference)
+  assertAlmostEqual(EAC1_method1, 300000, 200, 'EAC Method 1 - CPI based');
   
   // EAC Method 2: Remaining work at budgeted rate
   const EAC1_method2 = scenario1.AC + (scenario1.BAC - scenario1.EV); // 90000 + 140000 = 230,000

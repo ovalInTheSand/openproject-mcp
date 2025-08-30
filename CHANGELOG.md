@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.0.0] - 2025-08-28
 
+## [3.2.0] - 2025-08-30
+
+### 🔐 Security & Observability Hardening
+Added env-driven rate limiting overrides, increased default body limit (512KB), Retry-After headers, per-tool execution timeouts with override map, SSE connection cap, HMAC request integrity (optional), nonce replay protection, IP hashing privacy option, egress allowlist enforcement, and comprehensive input size/depth guards.
+
+### 📊 New Introspection & Metrics
+- New tools: `system.getCapabilities`, `system.getMetrics`.
+- In-memory counters: requests, rate-limited, tool call outcomes, latency buckets.
+- Request correlation via `x-request-id` header.
+
+### 🧮 EVM & Hybrid Validation
+Refined EVM forecast variants integration retained; added live validation script to exercise EVM and variable retrieval against OpenProject.
+
+### 📄 Documentation
+README updated with environment variable matrix, capability discovery, metrics, and HMAC signing instructions. SECURITY-CHECKLIST expanded with runtime controls.
+
+### ✅ Reliability Improvements
+Unified error codes (`tool_timeout`, `upstream_error`, `validation_error`, `auth_failed`, `input_limit_exceeded`) in structuredContent for consistent client handling.
+
+### ♻️ Internal
+Centralized metrics module, enhanced middleware with layered guards, and per-tool timeout resolution.
+
+No breaking API changes; minor additive capabilities (two new system tools). Recommended upgrade for stronger security posture.
+
 ### 🎯 **Major Release - Professional Private Package**
 
 This release transforms the OpenProject MCP server from an enterprise prototype into a professional, production-ready package optimized for private use while establishing the foundation for future public release. Built on LESSONS.yaml discoveries and real deployment experience with `thisistheway.local`.

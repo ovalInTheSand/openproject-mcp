@@ -8,6 +8,7 @@
 
 import { test } from 'node:test';
 import { strictEqual, ok } from 'node:assert';
+import { parseMcpFetchResponse } from './_helpers/mcpResponse.js';
 
 const MCP_ENDPOINT = process.env.MCP_ENDPOINT || 'http://localhost:8788/mcp';
 
@@ -24,15 +25,15 @@ async function mcpCall(method, name, args = {}) {
 
   const response = await fetch(MCP_ENDPOINT, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
-    },
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json, text/event-stream'
+      },
     body: JSON.stringify(request)
   });
 
   ok(response.ok, `MCP call failed with status: ${response.status}`);
-  return await response.json();
+  return await parseMcpFetchResponse(response);
 }
 
 /**

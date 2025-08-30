@@ -8,6 +8,7 @@
 
 import { test } from 'node:test';
 import { strictEqual, ok } from 'node:assert';
+import { parseMcpFetchResponse } from './_helpers/mcpResponse.js';
 
 const MCP_ENDPOINT = process.env.MCP_ENDPOINT || 'http://localhost:8788/mcp';
 
@@ -30,14 +31,14 @@ test('MCP Server - Health Check', async (t) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Accept': 'application/json, text/event-stream'
       },
       body: JSON.stringify(request)
     });
 
     ok(response.ok, `Health check failed with status: ${response.status}`);
     
-    const data = await response.json();
+  const data = await parseMcpFetchResponse(response);
     strictEqual(data.jsonrpc, '2.0', 'Invalid JSON-RPC version');
     strictEqual(data.id, 1, 'Response ID mismatch');
     ok(data.result, 'Health check should return result');
@@ -69,14 +70,14 @@ test('MCP Server - Tools List', async (t) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Accept': 'application/json, text/event-stream'
       },
       body: JSON.stringify(request)
     });
 
     ok(response.ok, `Tools list failed with status: ${response.status}`);
     
-    const data = await response.json();
+  const data = await parseMcpFetchResponse(response);
     strictEqual(data.jsonrpc, '2.0', 'Invalid JSON-RPC version');
     ok(data.result, 'Tools list should return result');
     ok(Array.isArray(data.result.tools), 'Tools should be an array');
@@ -124,14 +125,14 @@ test('OpenProject API - Projects List', async (t) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Accept': 'application/json, text/event-stream'
       },
       body: JSON.stringify(request)
     });
 
     ok(response.ok, `Projects list failed with status: ${response.status}`);
     
-    const data = await response.json();
+  const data = await parseMcpFetchResponse(response);
     strictEqual(data.jsonrpc, '2.0', 'Invalid JSON-RPC version');
     
     if (data.error) {
@@ -169,14 +170,14 @@ test('MCP Protocol - Invalid Method', async (t) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Accept': 'application/json, text/event-stream'
       },
       body: JSON.stringify(request)
     });
 
     ok(response.ok, 'Server should respond even to invalid methods');
     
-    const data = await response.json();
+  const data = await parseMcpFetchResponse(response);
     strictEqual(data.jsonrpc, '2.0', 'Invalid JSON-RPC version');
     strictEqual(data.id, 4, 'Response ID mismatch');
     ok(data.error, 'Invalid method should return error');

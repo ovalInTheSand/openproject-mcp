@@ -42,13 +42,17 @@ export async function listTypes({ env }: Ctx, input: z.infer<typeof listTypesInp
 //
 // Work packages: list
 //
+// Stricter filter & sort schemas while still allowing raw pre-encoded strings for backward compatibility
+const filterClause = z.record(z.object({ operator: z.string(), values: z.array(z.any()) }));
+const filtersArraySchema = z.array(filterClause);
+const sortTuple = z.tuple([z.string(), z.enum(["asc", "desc"])]);
+const sortBySchema = z.array(sortTuple);
 export const listWPsInput = z.object({
   projectId: z.union([z.string(), z.number()]).optional(),
-  // This should be a JSON structure understood by OpenProject; we also accept a pre-encoded string for flexibility
-  filters: z.any().optional(),
+  filters: z.union([z.string(), filtersArraySchema]).optional().describe("Array of filter objects or JSON string"),
   offset: z.number().int().min(0).default(0),
   pageSize: z.number().int().min(1).max(200).default(25),
-  sortBy: z.any().optional().describe('JSON array like [["id","asc"]]'),
+  sortBy: z.union([z.string(), sortBySchema]).optional().describe('Array like [["id","asc"]] or JSON string'),
 });
 export async function listWorkPackages({ env }: Ctx, input: z.infer<typeof listWPsInput>) {
   const base = input.projectId ? `/api/v3/projects/${input.projectId}/work_packages` : "/api/v3/work_packages";
@@ -177,29 +181,38 @@ export async function updateWorkPackage({ env }: Ctx, input: z.infer<typeof upda
 export const attachInput = z.object({
   workPackageId: z.union([z.string(), z.number()]),
   fileName: z.string().min(1),
-  // Base64-encoded file content (raw). This keeps the transport simple.
   dataBase64: z.string().min(1),
   contentType: z.string().default("application/octet-stream"),
   description: z.string().optional(),
 });
 
+const MAX_ATTACHMENT_BYTES = 5 * 1024 * 1024; // 5MB safeguard
 export async function attachToWorkPackage({ env }: Ctx, input: z.infer<typeof attachInput>) {
-  // Per spec, two parts: "metadata" (application/json) and "file" (raw content).
+  const b64 = input.dataBase64.trim();
+  const padding = (b64.endsWith("==") ? 2 : b64.endsWith("=") ? 1 : 0);
+  const approxSize = Math.floor((b64.length * 3) / 4) - padding;
+  if (approxSize > MAX_ATTACHMENT_BYTES) {
+    throw new Error(`Attachment exceeds max size of ${MAX_ATTACHMENT_BYTES} bytes (approx ${approxSize}).`);
+  }
   const form = new FormData();
   const metadata = {
     fileName: input.fileName,
     description: input.description ? { format: "plain", raw: input.description } : undefined,
   };
   form.append("metadata", new Blob([JSON.stringify(metadata)], { type: "application/json" }), "metadata.json");
-
-  // Decode base64 into raw bytes
-  const bytes = Uint8Array.from(atob(input.dataBase64), (c) => c.charCodeAt(0));
-  form.append("file", new Blob([bytes], { type: input.contentType }), input.fileName);
-
+  let bytes: Uint8Array;
+  try {
+    bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+  } catch {
+    throw new Error("Invalid base64 data");
+  }
+  // Cast to ArrayBuffer to satisfy TS in some environments
+  const pureBuffer = new Uint8Array(bytes).buffer; // guarantee ArrayBuffer instance
+  form.append("file", new Blob([pureBuffer], { type: input.contentType }), input.fileName);
   const { json } = await opFetch<any>(env, `/api/v3/work_packages/${input.workPackageId}/attachments`, {
     method: "POST",
-    body: form as any, // Workers supports FormData directly
-    headers: { /* content-type auto-set by runtime */ },
+    body: form as any,
+    headers: {},
   });
   return json;
 }

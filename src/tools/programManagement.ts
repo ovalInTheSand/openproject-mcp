@@ -1,6 +1,6 @@
 // src/tools/programManagement.ts
 import { z } from "zod";
-import { opFetch, joinUrl } from "../util/op.js";
+import { opFetch, joinUrl } from "../util/op";
 
 // ===== PROGRAM MANAGEMENT SCHEMAS =====
 
@@ -234,19 +234,17 @@ export async function coordinateDeliveries(
   const { json: programResponse } = await opFetch<any>(ctx.env, `/api/v3/projects/${input.programId}`);
   
   // Get all child projects
-  const { json: childProjectsResponse } = await opFetch<any>(
-    ctx.env,
-    joinUrl("/api/v3/projects", {
-      filters: JSON.stringify([
-        {
-          "parent": {
-            "operator": "=",
-            "values": [input.programId.toString()]
-          }
+  const params: any = {
+    filters: JSON.stringify([
+      {
+        "parent": {
+          "operator": "=",
+          "values": [input.programId.toString()]
         }
-      ])
-    })
-  );
+      }
+    ])
+  };
+  const { json: childProjectsResponse } = await opFetch<any>(ctx.env, "/api/v3/projects", { params });
 
   const childProjects = childProjectsResponse._embedded?.elements || [];
   
@@ -342,19 +340,17 @@ export async function trackProgramBenefits(
     JSON.parse(programResponse.customField8) : [];
 
   // Get all child projects for benefit analysis
-  const { json: childProjectsResponse } = await opFetch<any>(
-    ctx.env,
-    joinUrl("/api/v3/projects", {
-      filters: JSON.stringify([
-        {
-          "parent": {
-            "operator": "=",
-            "values": [input.programId.toString()]
-          }
+  const params2: any = {
+    filters: JSON.stringify([
+      {
+        "parent": {
+          "operator": "=",
+          "values": [input.programId.toString()]
         }
-      ])
-    })
-  );
+      }
+    ])
+  };
+  const { json: childProjectsResponse } = await opFetch<any>(ctx.env, "/api/v3/projects", { params: params2 });
 
   const childProjects = childProjectsResponse._embedded?.elements || [];
   
@@ -378,7 +374,7 @@ export async function trackProgramBenefits(
       measurementCriteria: expectedBenefit.measurementCriteria,
       currentValue: "0", // Would need actual measurement
       realizationPercentage: 0,
-      status: "in_progress" as BenefitStatusSchema,
+      status: "in_progress" as z.infer<typeof BenefitStatusSchema>,
       contributingProjects: [],
       riskFactors: []
     };
@@ -459,8 +455,8 @@ export async function trackProgramBenefits(
     reportingDate: new Date().toISOString(),
     totalExpectedBenefits: expectedBenefits.length,
     projectsAnalyzed: childProjects.length,
-    realizationRate: benefitsTracking.realizationSummary.realizationRate || 0,
-    overallStatus: benefitsTracking.realizationSummary.overallStatus || "unknown"
+    realizationRate: (benefitsTracking.realizationSummary as any)?.realizationRate ?? 0,
+    overallStatus: (benefitsTracking.realizationSummary as any)?.overallStatus ?? "unknown"
   };
 }
 
@@ -480,19 +476,17 @@ export async function manageProgramStakeholders(
   const memberships = membershipsResponse._embedded?.elements || [];
 
   // Get child projects for comprehensive stakeholder view
-  const { json: childProjectsResponse } = await opFetch<any>(
-    ctx.env,
-    joinUrl("/api/v3/projects", {
-      filters: JSON.stringify([
-        {
-          "parent": {
-            "operator": "=",
-            "values": [input.programId.toString()]
-          }
+  const params3: any = {
+    filters: JSON.stringify([
+      {
+        "parent": {
+          "operator": "=",
+          "values": [input.programId.toString()]
         }
-      ])
-    })
-  );
+      }
+    ])
+  };
+  const { json: childProjectsResponse } = await opFetch<any>(ctx.env, "/api/v3/projects", { params: params3 });
 
   const childProjects = childProjectsResponse._embedded?.elements || [];
   
@@ -594,39 +588,35 @@ async function analyzeInterProjectDependencies(env: any, projects: any[]) {
   for (const project of projects) {
     try {
       // Get work packages for this project
-      const { json: wpResponse } = await opFetch<any>(
-        env,
-        joinUrl("/api/v3/work_packages", {
-          filters: JSON.stringify([
-            {
-              "project": {
-                "operator": "=",
-                "values": [project.id.toString()]
-              }
+      const wpParams: any = {
+        filters: JSON.stringify([
+          {
+            "project": {
+              "operator": "=",
+              "values": [project.id.toString()]
             }
-          ]),
-          pageSize: 50
-        })
-      );
+          }
+        ]),
+        pageSize: 50
+      };
+      const { json: wpResponse } = await opFetch<any>(env, "/api/v3/work_packages", { params: wpParams });
 
       const workPackages = wpResponse._embedded?.elements || [];
 
       // Check for relations to work packages in other projects
       for (const wp of workPackages.slice(0, 10)) { // Limit to avoid too many API calls
         try {
-          const { json: relationsResponse } = await opFetch<any>(
-            env,
-            joinUrl("/api/v3/relations", {
-              filters: JSON.stringify([
-                {
-                  "from": {
-                    "operator": "=",
-                    "values": [wp.id.toString()]
-                  }
+          const relParams: any = {
+            filters: JSON.stringify([
+              {
+                "from": {
+                  "operator": "=",
+                  "values": [wp.id.toString()]
                 }
-              ])
-            })
-          );
+              }
+            ])
+          };
+          const { json: relationsResponse } = await opFetch<any>(env, "/api/v3/relations", { params: relParams });
 
           const relations = relationsResponse._embedded?.elements || [];
           

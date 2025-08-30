@@ -7,4 +7,4 @@ export * from "./format.js";
 export * from "./validation.js";
 
 // Re-export OpenProject API utilities (from existing util/op.ts)
-export * from "../util/op.js";
+export * from "../util/op";

@@ -24,8 +24,8 @@ const ResponseModeSchema = z.enum([
   'no_action'  // Maintain relationships but don't auto-adjust dates
 ]).describe("How dependent tasks respond to changes");
 
-// Duration schema for lead/lag (ISO 8601 format)
-const DurationSchema = z.string().regex(/^-?PT?\d+[HDWMY]$/).optional().describe("Lead/lag duration (PT2D = 2 days lag, -PT1D = 1 day lead)");
+// Enhanced duration schema for lead/lag with negative lag support (OpenProject 2024-2025)
+const DurationSchema = z.string().regex(/^-?P(?:\d+D)?(?:T(?:\d+H)?(?:\d+M)?(?:\d+S)?)?$/).optional().describe("Lead/lag duration (P2D = 2 days lag, -P1D = 1 day negative lag/lead)");
 
 // External dependency types
 const ExternalDependencyTypeSchema = z.enum([
@@ -71,7 +71,41 @@ export const createDependencyInput = z.object({
   contactPersonId: z.union([z.string(), z.number()]).optional().describe("Contact person for external dependencies"),
 }).strict();
 
+// Helper function for negative lag validation and conversion
+function validateAndConvertLag(lag?: string): { isValid: boolean; days: number; type: 'lead' | 'lag' | 'none'; displayText: string } {
+  if (!lag) return { isValid: true, days: 0, type: 'none', displayText: 'No lead/lag' };
+  
+  const match = lag.match(/^(-?)P(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?$/);
+  if (!match) return { isValid: false, days: 0, type: 'none', displayText: 'Invalid format' };
+  
+  const [, sign, days = '0', hours = '0', minutes = '0', seconds = '0'] = match;
+  const totalDays = parseInt(days) + (parseInt(hours) / 24) + (parseInt(minutes) / (24 * 60)) + (parseInt(seconds) / (24 * 60 * 60));
+  const isNegative = sign === '-';
+  const actualDays = isNegative ? -totalDays : totalDays;
+  
+  return {
+    isValid: true,
+    days: actualDays,
+    type: isNegative ? 'lead' : totalDays > 0 ? 'lag' : 'none',
+    displayText: isNegative 
+      ? `${totalDays} day${totalDays !== 1 ? 's' : ''} lead (starts before predecessor finishes)`
+      : totalDays > 0 
+        ? `${totalDays} day${totalDays !== 1 ? 's' : ''} lag (starts after predecessor finishes)`
+        : 'No lead/lag'
+  };
+}
+
 export async function createDependency({ env }: Ctx, input: z.infer<typeof createDependencyInput>) {
+  // Validate negative lag support (OpenProject 2024-2025 feature)
+  const lagValidation = validateAndConvertLag(input.lag);
+  if (!lagValidation.isValid) {
+    return {
+      ok: false,
+      error: `Invalid lag format: ${input.lag}. Use ISO 8601 format like P1D for 1 day lag or -P1D for 1 day lead (negative lag).`,
+      lagValidation
+    };
+  }
+  
   // Build dependency payload
   const payload: any = {
     _links: {
@@ -83,7 +117,15 @@ export async function createDependency({ env }: Ctx, input: z.infer<typeof creat
   // Map relation type to OpenProject format
   payload.type = input.relationType;
   
-  // Add description combining all metadata
+  // Add lag/lead time with proper OpenProject format
+  if (input.lag) {
+    payload.lag = Math.abs(lagValidation.days);
+    if (lagValidation.type === 'lead') {
+      payload.lag = -payload.lag; // OpenProject uses negative values for lead time
+    }
+  }
+  
+  // Add description combining all metadata with enhanced negative lag info
   const descriptionParts = [];
   if (input.description) descriptionParts.push(input.description);
   if (input.rationale) descriptionParts.push(`**Rationale**: ${input.rationale}`);
@@ -91,7 +133,7 @@ export async function createDependency({ env }: Ctx, input: z.infer<typeof creat
   if (input.externalDescription) descriptionParts.push(`**External Details**: ${input.externalDescription}`);
   if (input.riskLevel !== 'medium') descriptionParts.push(`**Risk Level**: ${input.riskLevel}`);
   if (input.businessImpact !== 'moderate') descriptionParts.push(`**Business Impact**: ${input.businessImpact}`);
-  if (input.lag) descriptionParts.push(`**Lead/Lag**: ${input.lag}`);
+  if (input.lag) descriptionParts.push(`**Timing**: ${lagValidation.displayText}`);
   if (!input.mandatory) descriptionParts.push(`**Type**: Soft constraint`);
   
   if (descriptionParts.length > 0) {
@@ -127,6 +169,9 @@ export async function createDependency({ env }: Ctx, input: z.infer<typeof creat
       external: input.external,
       riskLevel: input.riskLevel,
       criticalPath: input.relationType === 'follows' && input.mandatory,
+      // Enhanced negative lag support (OpenProject 2024-2025)
+      lagInfo: lagValidation,
+      supportsNegativeLag: true
     }
   };
 }
@@ -428,6 +473,114 @@ export const removeDependencyInput = z.object({
   relationId: z.union([z.string(), z.number()]).describe("Relation ID to remove"),
   reason: z.string().optional().describe("Reason for removing dependency"),
 }).strict();
+
+// Enhanced relation management (OpenProject 2024-2025 two-level structure)
+export const manageRelationStructureInput = z.object({
+  workPackageId: z.union([z.string(), z.number()])
+    .describe("Work package to manage relations for"),
+  action: z.enum(['list_primary', 'list_other', 'reorganize'])
+    .describe("Action to perform on relation structure"),
+  relationCategory: z.enum(['primary', 'other']).optional()
+    .describe("Category of relations (primary: related_to, predecessor, successor, child, parent; other: duplicates, blocks, requires)"),
+}).strict();
+
+export async function manageRelationStructure({ env }: Ctx, input: z.infer<typeof manageRelationStructureInput>) {
+  try {
+    const { json: workPackage } = await opFetch<any>(env, `/api/v3/work_packages/${input.workPackageId}`);
+    const { json: relations } = await opFetch<any>(env, `/api/v3/work_packages/${input.workPackageId}/relations`);
+    
+    const allRelations = relations?._embedded?.elements || [];
+    
+    // Categorize relations according to new OpenProject 2024-2025 UI structure
+    const primaryRelations = allRelations.filter((rel: any) => 
+      ['relates', 'follows', 'precedes', 'parent', 'child'].includes(rel.type)
+    );
+    
+    const otherRelations = allRelations.filter((rel: any) => 
+      ['duplicates', 'blocks', 'requires', 'starts'].includes(rel.type)
+    );
+    
+    // Add enhanced negative lag information
+    const enhanceRelationWithLag = (relation: any) => {
+      const lagInfo = relation.lag 
+        ? validateAndConvertLag(relation.lag > 0 ? `P${relation.lag}D` : `-P${Math.abs(relation.lag)}D`)
+        : validateAndConvertLag();
+      
+      return {
+        ...relation,
+        lagInfo,
+        supportsNegativeLag: true,
+        canHaveNegativeLag: ['follows', 'precedes'].includes(relation.type)
+      };
+    };
+    
+    switch (input.action) {
+      case 'list_primary':
+        return {
+          workPackageId: input.workPackageId,
+          category: 'primary',
+          relations: primaryRelations.map(enhanceRelationWithLag),
+          count: primaryRelations.length,
+          availableTypes: [
+            { type: 'relates', name: 'Related to', supportsLag: false },
+            { type: 'follows', name: 'Predecessor', supportsLag: true, supportsNegativeLag: true },
+            { type: 'precedes', name: 'Successor', supportsLag: true, supportsNegativeLag: true },
+            { type: 'child', name: '(New) Child', supportsLag: false },
+            { type: 'parent', name: 'Parent', supportsLag: false }
+          ]
+        };
+        
+      case 'list_other':
+        return {
+          workPackageId: input.workPackageId,
+          category: 'other',
+          relations: otherRelations.map(enhanceRelationWithLag),
+          count: otherRelations.length,
+          availableTypes: [
+            { type: 'duplicates', name: 'Duplicates', supportsLag: false },
+            { type: 'blocks', name: 'Blocks', supportsLag: true, supportsNegativeLag: false },
+            { type: 'requires', name: 'Requires', supportsLag: true, supportsNegativeLag: false }
+          ]
+        };
+        
+      case 'reorganize':
+        return {
+          workPackageId: input.workPackageId,
+          structure: {
+            primary: {
+              name: 'Primary Relations',
+              description: 'Most common relations shown directly in UI',
+              relations: primaryRelations.map(enhanceRelationWithLag),
+              count: primaryRelations.length
+            },
+            other: {
+              name: 'Other Relations',
+              description: 'Less frequently used options grouped together',
+              relations: otherRelations.map(enhanceRelationWithLag),
+              count: otherRelations.length
+            }
+          },
+          newFeatures2025: {
+            negativeLagSupport: true,
+            twoLevelStructure: true,
+            enhancedUX: 'Primary choices visible at a glance, with organized secondary options'
+          }
+        };
+        
+      default:
+        return {
+          error: 'Invalid action specified',
+          validActions: ['list_primary', 'list_other', 'reorganize']
+        };
+    }
+    
+  } catch (error: any) {
+    return {
+      error: `Failed to manage relation structure: ${error.message}`,
+      workPackageId: input.workPackageId
+    };
+  }
+}
 
 export async function removeDependency({ env }: Ctx, input: z.infer<typeof removeDependencyInput>) {
   // Get relation details before deletion
