@@ -1,6 +1,6 @@
 // src/tools/milestonesEnterprise.ts
 import { z } from "zod";
-import { opFetch, parseCollectionMeta, hal } from "../util/op.js";
+import { opFetch, parseCollectionMeta, hal } from "../util/op";
 import type { Ctx } from "../tools";
 
 //

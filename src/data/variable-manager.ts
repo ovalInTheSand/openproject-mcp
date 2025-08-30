@@ -1,5 +1,5 @@
 // src/data/variable-manager.ts
-import { opFetch } from "../util/op.js";
+import { opFetch } from "../util/op";
 import { PMOVariablesSchema, DEFAULT_PMO_VARIABLES } from "../types/hybrid-data";
 import type { PMOVariables } from "../types/hybrid-data";
 import type { Ctx } from "../tools";

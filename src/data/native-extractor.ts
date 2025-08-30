@@ -1,5 +1,5 @@
 // src/data/native-extractor.ts
-import { opFetch, parseCollectionMeta, withQuery } from "../util/op.js";
+import { opFetch, parseCollectionMeta, withQuery } from "../util/op";
 import type { 
   NativeProjectMetrics, 
   NativeWorkPackageData, 

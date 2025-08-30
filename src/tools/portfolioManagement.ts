@@ -1,6 +1,6 @@
 // src/tools/portfolioManagement.ts
 import { z } from "zod";
-import { opFetch, joinUrl } from "../util/op.js";
+import { opFetch, joinUrl } from "../util/op";
 
 // ===== PORTFOLIO MANAGEMENT SCHEMAS =====
 

@@ -1,6 +1,6 @@
 // src/tools/health.ts
 import { z } from "zod";
-import { opFetch } from "../util/op.js";
+import { opFetch } from "../util/op";
 import type { Ctx } from "../tools";
 import { notifyToolExecution } from "../sse";
 

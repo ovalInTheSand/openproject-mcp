@@ -1,6 +1,6 @@
 // src/tools/timeTrackingEnterprise.ts
 import { z } from "zod";
-import { opFetch, parseCollectionMeta, hal, withQuery } from "../util/op.js";
+import { opFetch, parseCollectionMeta, hal, withQuery } from "../util/op";
 import type { Ctx } from "../tools";
 
 //

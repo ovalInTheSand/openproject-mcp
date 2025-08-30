@@ -1,6 +1,6 @@
 // src/tools/users.ts
 import { z } from "zod";
-import { opFetch, parseCollectionMeta, withQuery } from "../util/op.js";
+import { opFetch, parseCollectionMeta, withQuery } from "../util/op";
 import type { Ctx } from "../tools";
 
 //

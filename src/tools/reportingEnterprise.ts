@@ -5,7 +5,7 @@ import type { Ctx } from "../tools";
 import type { HybridProjectData } from "../types/hybrid-data";
 
 // Legacy imports for compatibility
-import { opFetch, parseCollectionMeta, withQuery } from "../util/op.js";
+import { opFetch, parseCollectionMeta, withQuery } from "../util/op";
 
 //
 // Enterprise Reporting & Analytics - EVM, Critical Path, Dashboard
