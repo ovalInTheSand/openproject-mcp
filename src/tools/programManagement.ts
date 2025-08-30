@@ -1,6 +1,6 @@
 // src/tools/programManagement.ts
 import { z } from "zod";
-import { opFetch, joinUrl } from "../util/op";
+import { opFetch, joinUrl } from "../util/op.js";
 
 // ===== PROGRAM MANAGEMENT SCHEMAS =====
 

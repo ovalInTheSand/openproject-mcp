@@ -1,6 +1,6 @@
 // src/tools/workPackagesEnterprise.ts
 import { z } from "zod";
-import { opFetch, parseCollectionMeta, hal, withQuery } from "../util/op";
+import { opFetch, parseCollectionMeta, hal, withQuery } from "../util/op.js";
 import type { Ctx } from "../tools";
 
 //

@@ -31,8 +31,7 @@ export class CustomPMCalculator {
     variables: PMOVariables,
     asOfDate?: Date
   ): EVMCalculation {
-    const reportDate = asOfDate || new Date();
-    const reportDateString = reportDate.toISOString().split('T')[0];
+  const reportDate = asOfDate || new Date();
     
     // Calculate Budget at Completion (BAC) from native estimated hours
     const budgetAtCompletion = nativeData.totalEstimatedHours * variables.standardLaborRate;

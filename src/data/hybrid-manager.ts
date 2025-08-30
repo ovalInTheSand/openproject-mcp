@@ -1,5 +1,6 @@
 // src/data/hybrid-manager.ts
-import { nativeExtractor } from "./native-extractor.js";
+// Use TypeScript source import without .js so ts-node/loader resolves correctly during tests
+import { nativeExtractor } from "./native-extractor";
 import { customCalculator } from "./custom-calculator";
 import { cacheManager } from "./cache-manager";
 import { variableManager } from "./variable-manager";

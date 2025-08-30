@@ -1,6 +1,6 @@
 // src/tools/notifications.ts
 import { z } from "zod";
-import { opFetch } from "../util/op";
+import { opFetch } from "../util/op.js";
 import type { Ctx } from "../tools";
 
 /**

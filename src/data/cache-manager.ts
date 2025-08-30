@@ -211,7 +211,7 @@ export class CacheManager {
     hitRate: number;
     topCalculationTypes: { type: string; count: number }[];
   } {
-    const now = Date.now();
+  // timestamp not currently used; retained logic simplified
     let expiredCount = 0;
     const typeCount = new Map<string, number>();
     
