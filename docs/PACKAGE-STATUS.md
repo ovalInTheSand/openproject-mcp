@@ -1,10 +1,10 @@
-# OpenProject MCP Server v2.0.0 - Package Status
+# OpenProject MCP Server v3.2.0 - Package Status
 
 ## 📦 Package Completion Status: ✅ READY
 
 **Release**: Professional Private Package  
 **Date**: August 28, 2025  
-**Version**: 2.0.0  
+**Version**: 3.2.0  
 **Environment**: Optimized for `thisistheway.local` with Caddy TLS
 
 ---
@@ -12,7 +12,7 @@
 ## 🎯 Core Capabilities
 
 ### MCP Server Implementation ✅
-- **54 MCP Tools Registered** - Full enterprise project management suite
+- **90 MCP Tools Registered** - Core, enterprise, hybrid, real-time & analytics suite
 - **JSON-RPC 2.0 Compliance** - Standard MCP protocol implementation
 - **Streamable HTTP Transport** - Single transport pattern maintained
 - **Professional Error Handling** - Structured error envelopes across all tools
@@ -20,7 +20,7 @@
 ### Tool Categories ✅
 - **Core Tools (14)**: Production-ready, full TypeScript compliance
 - **Enterprise Tools (39)**: Functional with minor TypeScript warnings (~20 expected)
-- **Business Tools (1)**: Health monitoring and connectivity validation
+- **Hybrid & Real-time Tools (37)**: Hybrid data, cache, notifications, comments, webhooks, dependencies structure
 
 ### OpenProject Integration ✅
 - **API v3 Compatibility** - Full HAL+JSON support
@@ -67,7 +67,7 @@
 - **Professional README** - Clear capability overview and usage examples
 
 ### Technical Documentation ✅
-- **CHANGELOG.md** - Complete v2.0.0 development journey tracking
+- **CHANGELOG.md** - Updated through v3.2.0 with security & metrics additions
 - **Test Suite README** (`tests/README.md`) - Testing procedures and requirements
 - **PACKAGE-STATUS.md** - This comprehensive status document
 

@@ -1,16 +1,18 @@
-# Final Shipping Report - OpenProject MCP Server v2.0.0
+# Final Shipping Report - OpenProject MCP Server v3.2.0
 
 ## 🚀 Executive Summary
 
 **Status**: ✅ **APPROVED FOR IMMEDIATE SHIPPING**  
 **Validation Date**: August 28, 2025  
-**Package Version**: v2.0.0 Professional Private Use + Enhanced Features  
+**Package Version**: v3.2.0 Professional Private Use + Security & Metrics Enhancements  
 **Overall Assessment**: Package is production-ready with excellent quality, robustness, and enhanced capabilities
 
-### ✨ **New Features Added**
-- **Optional SSE Front-door**: W3C-compliant Server-Sent Events for real-time updates (disabled by default)
-- **Comprehensive Mathematical Validation**: PMBOK-compliant EVM and critical path analysis testing
-- **Enhanced Test Coverage**: 19 total tests (14 passing + 5 mathematical accuracy tests)
+### ✨ **New Features Added (Since 2.x / 3.1)**
+- **Security Hardening**: Rate limiting override map, per-tool timeouts, HMAC integrity (optional), nonce replay cache, input guards (size, depth, arrays, filters), IP hashing privacy, egress allowlist.
+- **Metrics & Introspection**: `system.getCapabilities`, `system.getMetrics` with latency buckets & tool outcome counters.
+- **Refined EVM Forecasting**: Added `spiCpiPure` PMBOK combined index (authoritative), legacy `spiCpiLegacy`, plus alias `spiCpiCombined` → pure; deferred rounding; EV null normalization.
+- **Live Validation**: Env-gated reconciliation tests (`MCP_LIVE_VALIDATION=true`) comparing server vs local EVM calculations.
+- **Injection Test Refinement**: Allows safe functional timeout usage while blocking string-eval patterns.
 
 ---
 

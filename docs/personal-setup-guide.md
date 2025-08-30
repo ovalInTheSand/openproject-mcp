@@ -1,4 +1,4 @@
-# Personal Setup Guide - OpenProject MCP Server v2.0.0
+# Personal Setup Guide - OpenProject MCP Server v3.2.0
 
 > **Your Private Use Configuration Guide**  
 > This guide is tailored for your specific OpenProject setup at `thisistheway.local`

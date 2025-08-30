@@ -1,4 +1,4 @@
-# OpenProject MCP Server v3.1.0 🚀
+# OpenProject MCP Server v3.2.0 🚀
 
 **Advanced MCP server with hybrid OpenProject API integration, real-time webhooks, enhanced notifications, internal comments, negative lag dependencies, dynamic PMO variables, and AI-powered enterprise analytics**
 
@@ -34,7 +34,7 @@ A sophisticated Model Context Protocol (MCP) server that provides comprehensive 
 - **Two-level Relation Structure**: Organized UI following OpenProject design patterns
 - **Webhook Delivery Monitoring**: Performance statistics and health tracking
 
-### 🧰 **40 Advanced MCP Tools**
+### 🧰 **90 MCP Tools (Core + Enterprise + Hybrid + Real-time)**
 - **hybrid.*** - Project data with native + custom calculations  
 - **variables.*** - PMO variable management and validation
 - **cache.*** - Cache performance and management
@@ -136,7 +136,14 @@ npm run dev
      -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
    ```
 
-## Available Tools (72 Total)
+## Available Tools (Updated 3.2.0 Overview)
+
+Key additions in 3.2.0:
+- Security hardening (rate limiting overrides, HMAC signing, nonce replay cache, input guards)
+- Metrics & introspection tools: `system.getCapabilities`, `system.getMetrics`
+- Refined EVM forecasting: Added `spiCpiPure` (PMBOK combined formula) & legacy alias `spiCpiCombined` plus `spiCpiLegacy`
+- Live reconciliation scripts (env‑gated) validating server vs local EVM math (`MCP_LIVE_VALIDATION=true`)
+- Injection test refined to allow safe functional timeouts while preventing string-eval
 
 ### 🔄 **Real-time & Communication Tools**
 
@@ -388,6 +395,30 @@ npm run dev
   }
 }
 ```
+
+## EVM Forecast Variant Details (3.2.0)
+
+The Earned Value report (`reports.earnedValue`) now exposes multiple EAC variants:
+- `cpiBased`: AC + (BAC - EV) / CPI
+- `budgetRate`: BAC / CPI
+- `spiCpiPure`: BAC / (CPI * SPI)   (PMBOK combined performance index – new authoritative default)
+- `spiCpiLegacy`: AC + (BAC - EV) / (CPI * SPI)
+- `spiCpiCombined`: Alias -> `spiCpiPure` (for backward compatibility with earlier name)
+- `acPlusRemainingOverCpi`: Alternative budgeting perspective
+
+Rounding is deferred until final output to preserve precision internally; EV null values are normalized to 0 for stability.
+
+## Live Validation & Reconciliation
+
+Two optional test runners compare local calculator output with server responses:
+- `tests/live-validation.test.js` – general tool / metrics sanity
+- `tests/live-atomic-validation.js` – atomic EVM number reconciliation
+
+Enable via environment:
+```bash
+MCP_LIVE_VALIDATION=true npm test
+```
+Failures highlight drift > tolerance so forecast math regressions are caught early.
 
 ## Deployment
 

@@ -18,13 +18,13 @@ Added env-driven rate limiting overrides, increased default body limit (512KB), 
 - Request correlation via `x-request-id` header.
 
 ### 🧮 EVM & Hybrid Validation
-Refined EVM forecast variants integration retained; added live validation script to exercise EVM and variable retrieval against OpenProject.
+Refined EVM forecast variants: added `spiCpiPure` (PMBOK combined index) as authoritative default, legacy `spiCpiLegacy`, backward-compatible alias `spiCpiCombined`→pure, deferred rounding, normalized null EV to 0; added live validation & atomic reconciliation scripts.
 
 ### 📄 Documentation
 README updated with environment variable matrix, capability discovery, metrics, and HMAC signing instructions. SECURITY-CHECKLIST expanded with runtime controls.
 
 ### ✅ Reliability Improvements
-Unified error codes (`tool_timeout`, `upstream_error`, `validation_error`, `auth_failed`, `input_limit_exceeded`) in structuredContent for consistent client handling.
+Unified error codes (`tool_timeout`, `upstream_error`, `validation_error`, `auth_failed`, `input_limit_exceeded`) in structuredContent for consistent client handling; refined injection test to allow functional timeouts while prohibiting string-eval patterns.
 
 ### ♻️ Internal
 Centralized metrics module, enhanced middleware with layered guards, and per-tool timeout resolution.

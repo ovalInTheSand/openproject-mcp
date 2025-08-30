@@ -1,7 +1,7 @@
-# API Reference - OpenProject MCP Server v2.0.0
+# API Reference - OpenProject MCP Server v3.2.0
 
 > **Complete Tool Reference for Your MCP Server**  
-> All 54 available tools with examples and parameters
+> All 90 available tools with examples and parameters (core, enterprise, hybrid, real-time, analytics)
 > 
 > **Transport Options:**
 > - **Primary**: `/mcp` - MCP protocol over streamable HTTP
@@ -9,18 +9,39 @@
 
 ## Tool Categories
 
-- [Core Operations](#core-operations) (5 tools)
-- [Workflow Support](#workflow-support) (9 tools) 
+- [Core Operations](#core-operations) (14 tools)
+- [Workflow Support](#workflow-support) (9 tools)
 - [Enterprise Management](#enterprise-management) (23 tools)
+- [Hybrid Data & Cache](#hybrid-data--cache) (22 tools)
+- [Real-time & Collaboration](#real-time--collaboration) (17 tools)
 - [Portfolio Management](#portfolio-management) (5 tools)
 - [Risk Management](#risk-management) (4 tools)
 - [Predictive Analytics](#predictive-analytics) (3 tools)
 - [Program Management](#program-management) (4 tools)
-- [Real-time Events](#real-time-events) (SSE endpoint)
+- [System Introspection](#system-introspection) (2 tools)
 
 ---
 
 ## Core Operations
+## System Introspection
+
+### system.getCapabilities
+Lists all registered tools with input schema field summaries.
+
+### system.getMetrics
+Returns in-memory counters (request counts, tool successes/errors/timeouts, latency buckets) for operational observability.
+
+## Hybrid Data & Cache
+
+Documentation for hybrid tools (getProjectData, getProjectStatus, getProjectVariables, setProjectVariables, organizational defaults, user variables, multi-project analytics, cache performance, cache warming, exportProjectVariables, analyzeEVMWithBenchmark, getSystemHealth) to be expanded; these tools expose fused native + custom calculator fields and variable management endpoints.
+
+## Real-time & Collaboration
+
+Includes notifications.*, comments.*, webhooks.*, and dependencies.manageStructure plus negative lag dependency features.
+
+## EVM Forecast Variant Update (v3.2.0)
+`reports.earnedValue` now returns additional forecast variants:
+`spiCpiPure` (BAC/(CPI*SPI)), `spiCpiLegacy` (AC+(BAC-EV)/(CPI*SPI)), and alias `spiCpiCombined` -> `spiCpiPure` for backward compatibility. Legacy consumers referencing `spiCpiCombined` receive the PMBOK pure combined index result.
 
 ### op.health
 **Check OpenProject connectivity and authentication**

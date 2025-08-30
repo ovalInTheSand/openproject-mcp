@@ -1,4 +1,4 @@
-# Troubleshooting Guide - OpenProject MCP Server v2.0.0
+# Troubleshooting Guide - OpenProject MCP Server v3.2.0
 
 > **Based on real development experience with thisistheway.local**  
 > Solutions derived from LESSONS.yaml and actual deployment challenges

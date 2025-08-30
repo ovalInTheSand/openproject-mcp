@@ -1,4 +1,4 @@
-# OpenProject MCP v3.1.0 - Testing & Validation Report
+# OpenProject MCP v3.2.0 - Testing & Validation Report
 
 ## 📊 Executive Summary
 
@@ -6,7 +6,7 @@
 **Validation Level**: 🟢 **COMPREHENSIVE + REAL-TIME READY**  
 **Production Readiness**: 🟢 **PRODUCTION READY**
 
-The OpenProject MCP v3.1.0 includes comprehensive OpenProject API integration with real-time webhooks, notification filtering, internal comments with security, and negative lag dependencies. All features are implemented and ready for production deployment.
+The OpenProject MCP v3.2.0 builds on 3.1.0 adding security hardening (rate limiting overrides, HMAC signing, nonce replay cache, input guards), metrics & introspection tools (`system.getCapabilities`, `system.getMetrics`), refined EVM forecasting variants (spiCpiPure legacy alignment), and live validation reconciliation tests. All features pass the updated test suite.
 
 ---
 
@@ -28,7 +28,7 @@ The OpenProject MCP v3.1.0 includes comprehensive OpenProject API integration wi
 
 ### ✅ **MCP Tool Integration (100% Complete)**
 - **40 Advanced MCP Tools**: 22 hybrid + 18 real-time integration tools
-- **Server Integration**: Version 3.1.0 with comprehensive descriptions
+- **Server Integration**: Version 3.2.0 with comprehensive descriptions & introspection
 - **Input Validation**: Zod schemas for all tools
 - **Error Handling**: Comprehensive error envelopes and validation
 

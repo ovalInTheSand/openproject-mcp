@@ -1,9 +1,11 @@
-# Deployment Guide - OpenProject MCP Server v2.0.0
+# Deployment Guide - OpenProject MCP Server v3.2.0
 
 > **Professional Deployment for Your Private Use**  
 > Cloudflare Workers + Docker options optimized for thisistheway.local
 
 ## Overview
+
+v3.2.0 adds security hardening (rate limiting overrides, HMAC signing, nonce replay cache, input size/depth guards), metrics & introspection tools (`system.getCapabilities`, `system.getMetrics`), and refined EVM forecasting variants. No breaking changes to existing deployment steps; simply redeploy after updating environment variables if enabling HMAC or custom per-tool timeout map.
 
 This guide covers deploying your professional MCP server for daily use, with options for:
 - **Cloudflare Workers** (Recommended) - Scalable, serverless
