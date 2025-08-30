@@ -161,8 +161,10 @@ export interface EVMCalculation {
   forecastVariants?: {
     cpiBased: number;                 // BAC / CPI
     budgetRate: number;               // AC + (BAC - EV)
-    spiCpiCombined: number;           // AC + ((BAC - EV) / (CPI * SPI))
-    acPlusRemainingOverCpi: number;   // AC + (BAC - EV) / CPI
+  spiCpiPure?: number;              // BAC / (CPI * SPI) (PMBOK pure combined)
+  spiCpiLegacy?: number;            // AC + ((BAC - EV) / (CPI * SPI)) legacy variant
+  spiCpiCombined?: number;          // Alias for legacy to preserve older clients
+  acPlusRemainingOverCpi: number;   // AC + (BAC - EV) / CPI
   };
   forecastMethodApplied?: string; // Which variant populated estimateAtCompletion
 }

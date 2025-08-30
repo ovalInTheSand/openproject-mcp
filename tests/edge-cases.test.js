@@ -143,8 +143,9 @@ test('Edge Case: Code Injection Prevention', async (t) => {
   // Check for potential injection vulnerabilities
   ok(!serverContent.includes('eval('), 'No eval() usage');
   ok(!serverContent.includes('Function('), 'No Function() constructor');
-  ok(!serverContent.includes('setTimeout('), 'No setTimeout with string');
-  ok(!serverContent.includes('setInterval('), 'No setInterval with string');
+  // Allow functional setTimeout/setInterval but disallow string-eval style usage
+  ok(!/setTimeout\s*\(\s*['"]/i.test(serverContent), 'No setTimeout with string code');
+  ok(!/setInterval\s*\(\s*['"]/i.test(serverContent), 'No setInterval with string code');
   
   // Check for SQL injection prevention (should not have raw SQL)
   ok(!serverContent.includes('SELECT '), 'No raw SQL queries');

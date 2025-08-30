@@ -499,9 +499,11 @@ test('Advanced EVM Scenarios - Multiple EAC Calculation Methods', async (t) => {
   const EAC1_method2 = scenario1.AC + (scenario1.BAC - scenario1.EV); // 90000 + 140000 = 230,000
   strictEqual(EAC1_method2, 230000, 'EAC Method 2 - Remaining at budget');
   
-  // EAC Method 3: Combined CPI and SPI impact
-  const EAC1_method3 = scenario1.BAC / (CPI1 * SPI1); // 200000/(0.667*0.75) = 399,800
-  assertAlmostEqual(EAC1_method3, 399800, 100, 'EAC Method 3 - Combined performance');
+  // EAC Method 3: Combined CPI and SPI impact (PMBOK pure combined)
+  const EAC1_method3 = scenario1.BAC / (CPI1 * SPI1); // 200000 / (0.666666... * 0.75) = 400000
+  // Accept very small numeric drift (should be exact here)
+  assertAlmostEqual(EAC1_method3, 400000, 1, 'EAC Method 3 - Combined performance (pure)');
+  // Legacy variant (for transparency) AC + (BAC - EV)/(CPI*SPI) = 370000 (document only)
   
   // Test Scenario 2: Schedule delays with cost control
   const scenario2 = {

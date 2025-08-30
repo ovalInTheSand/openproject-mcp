@@ -174,11 +174,15 @@ export class CustomPMCalculator {
     const spi = Math.max(0.01, schedulePerformanceIndex);
     const combined = Math.max(0.01, cpi * spi);
 
-    // PMI common variants
-    const eacCpiBased = budgetAtCompletion / cpi;                         // EAC = BAC / CPI
-    const eacBudgetRate = actualCost + remainingWork;                     // EAC = AC + (BAC - EV)
-    const eacSpiCpi = actualCost + (remainingWork / combined);            // EAC = AC + (BAC - EV)/(CPI*SPI)
-    const eacAcPlusRemainingOverCpi = actualCost + (remainingWork / cpi); // EAC = AC + (BAC - EV)/CPI
+  // PMI common variants (retain full precision; rounding only at output layer)
+  const eacCpiBased = budgetAtCompletion / cpi;                             // EAC = BAC / CPI
+  const eacBudgetRate = actualCost + remainingWork;                         // EAC = AC + (BAC - EV)
+  // PMBOK combined performance (commonly mis-applied). We provide BOTH forms:
+  //  - Pure combined index: BAC/(CPI*SPI)
+  //  - AC + (BAC - EV)/(CPI*SPI) (legacy / alternative). Expose both for transparency.
+  const eacSpiCpiPure = budgetAtCompletion / combined;                      // EAC = BAC / (CPI*SPI)
+  const eacSpiCpiLegacy = actualCost + (remainingWork / combined);         // Legacy variant
+  const eacAcPlusRemainingOverCpi = actualCost + (remainingWork / cpi);     // EAC = AC + (BAC - EV)/CPI
 
     let methodApplied = 'CPI';
     let selectedEAC = eacCpiBased;
@@ -189,7 +193,7 @@ export class CustomPMCalculator {
         break;
       case 'SPI_CPI':
         methodApplied = 'SPI_CPI';
-        selectedEAC = eacSpiCpi;
+        selectedEAC = eacSpiCpiPure; // Use PMBOK pure combined formula
         break;
       case 'custom_regression':
         // Use performance adjusted by risk (custom) but keep variants for transparency
@@ -202,9 +206,9 @@ export class CustomPMCalculator {
         selectedEAC = eacCpiBased;
     }
 
-    const estimateAtCompletion = selectedEAC;
-    const estimateToComplete = Math.max(0, estimateAtCompletion - actualCost);
-    const varianceAtCompletion = budgetAtCompletion - estimateAtCompletion;
+  const estimateAtCompletion = selectedEAC;
+  const estimateToComplete = Math.max(0, estimateAtCompletion - actualCost);
+  const varianceAtCompletion = budgetAtCompletion - estimateAtCompletion;
     const remainingBudget = remainingWork;
     const toCompletePerformanceIndex = remainingBudget > 0 ? estimateToComplete / remainingBudget : 1;
 
@@ -216,7 +220,9 @@ export class CustomPMCalculator {
       variants: {
         cpiBased: eacCpiBased,
         budgetRate: eacBudgetRate,
-        spiCpiCombined: eacSpiCpi,
+        spiCpiPure: eacSpiCpiPure,
+        spiCpiLegacy: eacSpiCpiLegacy,
+        spiCpiCombined: eacSpiCpiLegacy, // backward compatibility alias
         acPlusRemainingOverCpi: eacAcPlusRemainingOverCpi
       },
       methodApplied
