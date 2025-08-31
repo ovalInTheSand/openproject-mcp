@@ -26,8 +26,9 @@ yarn-error.log*
 .eslintrc*
 .eslintignore
 .prettierrc*
-tsconfig.json
-tsconfig.*.json
+# Allow TypeScript config for build type checking
+!tsconfig.json
+!tsconfig.*.json
 jest.config.js
 vitest.config.ts
 
