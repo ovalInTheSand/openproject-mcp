@@ -1,0 +1,103 @@
+# ============================================================================
+# Docker Compose for OpenProject MCP Server
+# ============================================================================
+# Easy local deployment with environment configuration
+# Usage: docker-compose up -d
+
+services:
+  openproject-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: openproject-mcp-server
+    restart: unless-stopped
+    
+    # Port mapping
+    ports:
+      - "8788:8788"
+    
+    # Environment configuration
+    environment:
+      # Basic configuration
+      - PORT=8788
+      - NODE_ENV=production
+      - SSE_ENABLED=false
+      
+      # Performance tuning
+      - NODE_OPTIONS=--max_old_space_size=512
+      
+      # Security settings (customize as needed)
+      - MCP_RATE_LIMIT=200
+      - MCP_RATE_WINDOW_MS=60000
+      - MCP_MAX_BODY_BYTES=524288
+      - MCP_TOOL_TIMEOUT_MS=15000
+      
+      # Input validation guards
+      - MCP_MAX_ARRAY_ITEMS=200
+      - MCP_MAX_STRING_LENGTH=5000
+      - MCP_MAX_NESTING_DEPTH=8
+      - MCP_MAX_FILTERS=25
+      
+    # Environment file (copy from .env.example)
+    env_file:
+      - .env.docker
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-X", "POST", "http://localhost:8788/mcp", "-H", "Content-Type: application/json", "-H", "Accept: application/json, text/event-stream", "-d", '{"jsonrpc":"2.0","id":"health","method":"tools/list","params":{}}']
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 3
+    
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.1'
+    
+    # Volume mounts (optional)
+    volumes:
+      # Uncomment to mount custom CA certificate
+      # - ./caddy-root.crt:/app/caddy-root.crt:ro
+      
+      # Uncomment to mount custom configuration
+      # - ./config:/app/config:ro
+      
+      # Logs volume (optional)
+      - mcp-logs:/app/logs
+
+  # Optional: Cache service (if using Redis for caching)
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: openproject-mcp-cache
+  #   restart: unless-stopped
+  #   command: redis-server --appendonly yes
+  #   volumes:
+  #     - redis-data:/data
+  #   ports:
+  #     - "6379:6379"
+
+# Named volumes
+volumes:
+  mcp-logs:
+    driver: local
+  # redis-data:
+  #   driver: local
+
+# Network configuration
+networks:
+  default:
+    name: openproject-mcp-network

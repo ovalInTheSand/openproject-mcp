@@ -1,0 +1,43 @@
+# ============================================================================
+# Docker Compose for OpenProject MCP Server - Development
+# ============================================================================
+# Development setup with hot reload and debug features
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+  openproject-mcp:
+    build:
+      target: builder  # Use builder stage for development
+    
+    # Override production command with development
+    command: ["npm", "run", "dev"]
+    
+    # Development environment overrides
+    environment:
+      - NODE_ENV=development
+      - SSE_ENABLED=true
+      
+    # Volume mounts for development
+    volumes:
+      - ./src:/app/src:cached
+      - ./package.json:/app/package.json:ro
+      - ./tsconfig.json:/app/tsconfig.json:ro
+      - ./wrangler.jsonc:/app/wrangler.jsonc:ro
+      - ./.dev.vars:/app/.dev.vars:ro
+      - ./caddy-root.crt:/app/caddy-root.crt:ro
+      
+    # Development ports (may include debug port)
+    ports:
+      - "8788:8788"
+      - "9229:9229"  # Debug port
+      
+    # Environment file for development
+    env_file:
+      - .env.dev
+    
+    # Remove resource limits for development
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'

@@ -44,6 +44,7 @@
     "deploy": "npm run build && wrangler deploy",
     "deploy:staging": "npm run build && wrangler deploy --env staging",
     "start": "NODE_EXTRA_CA_CERTS=./caddy-root.crt wrangler dev --port=8788",
+    "start:node": "PORT=8788 NODE_ENV=production tsx src/node-entry.ts",
     "restart": "pkill -f wrangler || true && npm run dev",
     "typecheck": "tsc --noEmit",
     "typecheck:watch": "tsc --noEmit --watch",
@@ -69,10 +70,10 @@
     "clean": "rm -rf dist .wrangler",
     "clean:all": "rm -rf dist .wrangler node_modules && npm install",
     "health": "curl -X POST http://localhost:8788/mcp -H 'Content-Type: application/json' -d '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/call\",\"params\":{\"name\":\"op.health\",\"arguments\":{}}}' | jq",
-  "version": "echo 'v3.4.0 - Containerization & Deployment Assets'",
-    "update-deps": "npm update && npm audit fix"
-  ,"release:prepare": "npm run build && npm run lint && npm test || true && echo 'Ready to deploy 3.4.0'"
-  ,"release:deploy": "npm run build && wrangler deploy"
+    "version": "echo 'v3.4.0 - Containerization & Deployment Assets'",
+    "update-deps": "npm update && npm audit fix",
+    "release:prepare": "npm run build && npm run lint && npm test || true && echo 'Ready to deploy 3.4.0'",
+    "release:deploy": "npm run build && wrangler deploy"
   },
   "dependencies": {
     "@hono/mcp": "^0.1.2",
@@ -83,6 +84,8 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240821.0",
+    "@hono/node-server": "^1.19.1",
+    "@types/node": "^24.3.0",
     "@typescript-eslint/eslint-plugin": "^8.41.0",
     "@typescript-eslint/parser": "^8.41.0",
     "eslint": "^9.34.0",

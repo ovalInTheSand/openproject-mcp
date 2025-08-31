@@ -34,18 +34,15 @@ RUN addgroup -g 1001 -S nodejs && \
 
 WORKDIR /app
 
-# Install runtime dependencies only
+# Install minimal runtime OS packages
 RUN apk add --no-cache \
-    curl \
-    ca-certificates \
-    tzdata
+  curl \
+  ca-certificates \
+  tzdata
 
-# Copy package files
-COPY package*.json ./
-
-# Install only production dependencies
-RUN npm ci --only=production && \
-    npm cache clean --force
+# Copy node modules (including wrangler & types) from builder so start script works
+COPY --from=builder --chown=openproject:nodejs /app/package*.json ./
+COPY --from=builder --chown=openproject:nodejs /app/node_modules ./node_modules
 
 # Copy built application from builder stage
 COPY --from=builder --chown=openproject:nodejs /app/src ./src
@@ -82,5 +79,5 @@ LABEL \
   org.opencontainers.image.vendor="Adam Sandoval" \
   org.opencontainers.image.licenses="MIT"
 
-# Production command
-CMD ["npm", "run", "start"]
+# Production command (Node server entrypoint without wrangler)
+CMD ["npm", "run", "start:node"]
