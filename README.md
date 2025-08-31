@@ -1,4 +1,4 @@
-# OpenProject MCP Server v3.3.0 🚀
+# OpenProject MCP Server v3.4.0 🚀
 
 **Advanced MCP server with hybrid OpenProject API integration, real-time webhooks, enhanced notifications, internal comments, negative lag dependencies, dynamic PMO variables, and AI-powered enterprise analytics**
 
@@ -166,7 +166,7 @@ Secrets shorter than 32 chars return 401 with code `weak_secret`.
      -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
    ```
 
-## Available Tools (Updated 3.3.0 Overview)
+## Available Tools (Updated 3.4.0 Overview)
 
 Key additions in 3.2.0:
 - Security hardening (rate limiting overrides, HMAC signing, nonce replay cache, input guards)
@@ -426,7 +426,7 @@ Key additions in 3.2.0:
 }
 ```
 
-## EVM Forecast Variant Details (3.3.0)
+## EVM Forecast Variant Details (3.4.0)
 
 The Earned Value report (`reports.earnedValue`) now exposes multiple EAC variants:
 - `cpiBased`: AC + (BAC - EV) / CPI
@@ -452,7 +452,104 @@ Failures highlight drift > tolerance so forecast math regressions are caught ear
 
 ## Deployment
 
-### Cloudflare Workers
+### 🐳 Docker (Recommended for Local/Self-hosted)
+
+The OpenProject MCP Server can be easily deployed using Docker for local development or self-hosted production environments.
+
+#### Quick Start with Docker
+
+1. **Copy environment configuration**:
+   ```bash
+   cp .env.example .env.docker
+   # Edit .env.docker with your OpenProject URL and API token
+   ```
+
+2. **Start with Docker Compose** (easiest):
+   ```bash
+   # Production mode
+   ./docker-compose-up.sh
+
+   # Or manually
+   docker-compose up -d
+   ```
+
+3. **Development mode** with hot reload:
+   ```bash
+   # Development mode
+   ./docker-compose-up.sh --dev
+
+   # Or manually
+   docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+   ```
+
+#### Docker Build Options
+
+**Build production image**:
+```bash
+./docker-build.sh
+# Or manually: docker build -t openproject-mcp:latest .
+```
+
+**Build development image**:
+```bash
+./docker-build.sh --dev
+```
+
+#### Manual Docker Run
+
+**Production container**:
+```bash
+./docker-run.sh
+# Or manually:
+docker run -p 8788:8788 --env-file .env.docker openproject-mcp:latest
+```
+
+**Development container with volume mounts**:
+```bash
+./docker-run.sh --dev
+```
+
+#### Environment Files
+
+- **`.env.docker`** - Production environment (copy from `.env.example`)
+- **`.env.dev`** - Development environment with relaxed security and debugging features
+
+#### Docker Compose Services
+
+- **openproject-mcp** - Main MCP server
+- **redis** (optional) - For enhanced caching (commented out by default)
+
+#### Health Check
+
+The container includes health checks that verify the MCP endpoint:
+```bash
+curl -X POST http://localhost:8788/mcp \
+  -H 'Content-Type: application/json' \
+  -d '{"jsonrpc":"2.0","id":"health","method":"tools/list"}'
+```
+
+#### Docker Scripts Reference
+
+| Script | Description |
+|--------|-------------|
+| `./docker-build.sh` | Build production Docker image |
+| `./docker-build.sh --dev` | Build development image with dev tools |
+| `./docker-run.sh` | Run production container |
+| `./docker-run.sh --dev` | Run development container with mounts |
+| `./docker-compose-up.sh` | Start with Docker Compose |
+| `./docker-compose-up.sh --dev` | Start in development mode |
+
+#### Production Considerations
+
+- **Security**: The production image runs as non-root user `openproject:nodejs`
+- **Resources**: Default limits are 1GB RAM, 0.5 CPU (configurable in docker-compose.yml)
+- **Logging**: JSON logs with rotation (max 10MB, 3 files)
+- **Health**: Built-in health checks every 30 seconds
+- **TLS**: Mount custom CA certificates if needed
+
+### ☁️ Cloudflare Workers
+
+For serverless deployment to Cloudflare's edge network:
 
 ```bash
 # Deploy to Cloudflare Workers

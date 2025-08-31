@@ -1,6 +1,6 @@
 {
   "name": "openproject-mcp",
-  "version": "3.3.0",
+  "version": "3.4.0",
   "description": "Advanced MCP server with hybrid OpenProject API integration, real-time webhooks, enhanced notifications, internal comments, negative lag dependencies, and AI-powered enterprise analytics (OpenProject 2024-2025 features)",
   "keywords": [
     "mcp",
@@ -69,9 +69,9 @@
     "clean": "rm -rf dist .wrangler",
     "clean:all": "rm -rf dist .wrangler node_modules && npm install",
     "health": "curl -X POST http://localhost:8788/mcp -H 'Content-Type: application/json' -d '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/call\",\"params\":{\"name\":\"op.health\",\"arguments\":{}}}' | jq",
-  "version": "echo 'v3.3.0 - Security Hardening (RBAC + Abortable Tools + Cache)'",
+  "version": "echo 'v3.4.0 - Containerization & Deployment Assets'",
     "update-deps": "npm update && npm audit fix"
-  ,"release:prepare": "npm run build && npm run lint && npm test || true && echo 'Ready to deploy 3.3.0'"
+  ,"release:prepare": "npm run build && npm run lint && npm test || true && echo 'Ready to deploy 3.4.0'"
   ,"release:deploy": "npm run build && wrangler deploy"
   },
   "dependencies": {

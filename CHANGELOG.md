@@ -74,6 +74,29 @@ No action required for existing 3.2.0 deployments unless enabling new RBAC scope
 ### Integrity Statement
 All changes validated via TypeScript build (no new type errors) and targeted security tests. Functional behavior of existing tools unchanged unless restricted by newly configured scopes.
 
+## [3.4.0] - 2025-08-30
+
+### 🚢 Containerization & Deployment Assets
+- Added production-grade multi-stage Dockerfile (non-root user, healthcheck, OCI labels) for persistent self-hosted runtime.
+- Added docker-compose (prod + dev override) with resource limits, env guards, optional Redis placeholder.
+- Added .dockerignore for minimal build context (excludes tests, docs, secrets, dev artifacts) – ensures lean image.
+- Added Docker quick start & script references in README (build, run, compose, dev mode).
+
+### 🔐 Security & Ops
+- Container runs as dedicated non-root user `openproject` (UID 1001) with minimal Alpine packages.
+- Healthcheck uses MCP tools/list ensuring full request path (Accept + JSON body) is responsive.
+- Preserves HMAC/RBAC env-driven controls inside container; secrets injected via env / compose not baked in.
+
+### 🧬 Version Synchronization
+- Bumped package, runtime constant, and Docker OCI label to 3.4.0 aligning with containerization milestone.
+
+### 📄 Documentation
+- Expanded README with Docker usage section, environment file guidance, resource tuning notes.
+
+### Migration / Upgrade Notes
+Purely additive; no API surface changes. Deploy by building new container or continuing Cloudflare Workers path. For self-host: copy `.env.example` to `.env.docker` (or supply env vars) then:
+`docker build -t openproject-mcp:3.4.0 . && docker run --rm -p 8788:8788 --env-file .env.docker openproject-mcp:3.4.0`.
+
 
 ### 🎯 **Major Release - Professional Private Package**
 

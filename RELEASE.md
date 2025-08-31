@@ -1,14 +1,14 @@
 # Release Procedure
 
 Date: 2025-08-30
-Current Version: 3.3.0
+Current Version: 3.4.0
 
 This document captures the lightweight packaging / publication steps for internal private release of the OpenProject MCP server.
 
 ## 1. Pre-Flight Checklist
 - [x] Version bumped in `package.json` and `src/constants/version.ts`
-- [x] CHANGELOG entry added for 3.3.0 (Keep a Changelog format)
-- [x] README header & security section updated to 3.3.0
+- [x] CHANGELOG entry added for 3.4.0 (Keep a Changelog format)
+- [x] README header & security section updated to 3.4.0
 - [x] SECURITY-CHECKLIST reflects new controls (RBAC, abort timeouts, HTTPS enforcement)
 - [x] TypeScript build passes (`npm run build`)
 - [x] Security tests added (HMAC, RBAC, rate limit, input guards)
@@ -23,8 +23,8 @@ npm run health         # Quick MCP health tool check (requires dev server)
 ## 3. Tag & Push (Private Repo)
 ```bash
 git add .
-git commit -m "chore(release): 3.3.0 security + rbac + abort timeouts"
-git tag -a v3.3.0 -m "3.3.0: RBAC scopes, HTTPS enforcement, abortable tool execution, cache improvements"
+git commit -m "chore(release): 3.4.0 containerization + deployment assets"
+git tag -a v3.4.0 -m "3.4.0: containerization, docker-compose, docs"
 git push origin main --tags
 ```
 
@@ -55,7 +55,7 @@ wrangler deploy --branch v3.2.0
 ```
 (or checkout commit hash then deploy)
 
-## 7. Next Target Items (Not in 3.3.0)
+## 7. Next Target Items (Not in 3.4.0)
 - Distributed rate limiting + nonce storage
 - Timeout simulation test harness
 - Persistent metrics export (Prometheus / push gateway)
