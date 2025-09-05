@@ -7,8 +7,12 @@ import type { Ctx } from "../tools";
 // Enterprise Work Package Management - MS Project/PMBOK Level
 //
 
-// Duration schema (ISO 8601 duration format: PT8H = 8 hours, PT2D = 2 days)
-const DurationSchema = z.string().regex(/^PT\d+[HDWMY]$/).optional().describe("ISO 8601 duration (PT8H, PT2D, etc.)");
+// Duration schema (ISO 8601, relaxed: supports PT8H, P2D, P3DT4H30M, PT45M, PT3600S)
+const DurationSchema = z.string()
+  .regex(/^P(?=\d|T\d)(\d+D)?(T(\d+H)?(\d+M)?(\d+S)?)?$/,
+    'Invalid ISO 8601 duration (examples: PT8H, P2D, P3DT4H30M, PT45M)')
+  .optional()
+  .describe("ISO 8601 duration (PT8H, P2D, P3DT4H30M, PT45M)");
 
 // Formattable field schema
 const FormattableFieldSchema = z.object({

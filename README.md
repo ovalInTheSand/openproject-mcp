@@ -172,8 +172,27 @@ cp .env.example .env.docker  # Configure your settings
 ### Optional
 - `ALLOWED_ORIGINS` - CORS origins (comma-separated)
 - `MCP_RATE_LIMIT` - Requests per minute (default: 200)
-- `MCP_HMAC_SECRET` - Enable HMAC request signing
+- `MCP_HMAC_SECRET` - Enable HMAC request signing (enables signature + nonce + timestamp validation)
 - `SSE_ENABLED` - Enable Server-Sent Events (default: false)
+- `MCP_SERVER_TOKEN` - Shared secret; enforces `x-mcp-auth` header when set
+- `DEV_MODE` - Enables offline stubs outside test env (safeguarded)
+- `OP_BASE_URL_AUTO_REWRITE` - Rewrite placeholder host (e.g. thisistheway.local) to fallback in dev
+- `DEV_HOST_FALLBACK` - Fallback base URL when auto rewrite enabled (default: https://127.0.0.1)
+- `MCP_OFFLINE_PERF_BUDGET_MS` - Max latency budget for offline stub tests (default: 2500)
+
+### CORS & Transport Hardening
+Custom security and MCP transport headers are unified across `/mcp` and `/sse`:
+`mcp-protocol-version`, `mcp-session-id`, `x-mcp-auth`, `x-mcp-signature`, `x-mcp-timestamp`, `x-mcp-nonce`, `last-event-id`.
+SSE no longer uses wildcard origin; origins must be listed in `ALLOWED_ORIGINS`.
+
+### Rate Limiter Pluggability
+The in-memory rate limiter can be replaced by providing a `RateLimitStore` implementation to `securityMiddleware`.
+
+### Dev Host Auto-Rewrite
+Enable `OP_BASE_URL_AUTO_REWRITE=true` with `DEV_HOST_FALLBACK` to automatically replace placeholder domains during local dev.
+
+### Offline Mode Guarding
+Offline synthetic responses only activate when `token === test-api-key` AND (`NODE_ENV==='test'` or `DEV_MODE==='true'`).
 
 ## 🔧 Development
 

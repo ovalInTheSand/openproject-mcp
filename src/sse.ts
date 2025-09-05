@@ -67,14 +67,18 @@ export async function handleSSEConnection(c: Context): Promise<Response> {
   const lastEventId = c.req.header('Last-Event-ID');
   const connectionId = generateConnectionId();
 
-  // Set SSE headers according to WHATWG specification
+  // Set SSE headers (aligned with primary CORS policy)
+  const allowed = c.env.ALLOWED_ORIGINS?.split(',').map(s=>s.trim()).filter(Boolean) ?? [];
+  const reqOrigin = c.req.header('origin');
+  const resolvedOrigin = allowed.length ? (reqOrigin && allowed.includes(reqOrigin) ? reqOrigin : allowed[0]) : '';
   const headers = new Headers({
     'Content-Type': 'text/event-stream; charset=utf-8',
     'Cache-Control': 'no-cache',
     'Connection': 'keep-alive',
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Cache-Control',
-    'Access-Control-Expose-Headers': 'Content-Type',
+    'Access-Control-Allow-Origin': resolvedOrigin,
+    'Access-Control-Allow-Credentials': 'true',
+    'Access-Control-Allow-Headers': 'cache-control,last-event-id,mcp-protocol-version,mcp-session-id,x-mcp-auth,x-mcp-signature,x-mcp-timestamp,x-mcp-nonce,content-type,authorization',
+    'Access-Control-Expose-Headers': 'content-type,cache-control'
   });
 
   // Create readable stream for SSE

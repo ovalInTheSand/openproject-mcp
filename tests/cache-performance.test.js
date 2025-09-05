@@ -20,7 +20,8 @@ const TEST_CONFIG = {
   testProjectId: process.env.TEST_PROJECT_ID || '1',
   testProjectIds: ['1', '2', '3'], // Multiple projects for testing
   performanceIterations: 10,
-  concurrencyLevel: 5
+  concurrencyLevel: 5,
+  offlinePerfBudgetMs: parseInt(process.env.MCP_OFFLINE_PERF_BUDGET_MS || '2000', 10)
 };
 
 const mockEnv = {
@@ -44,8 +45,8 @@ async function runTest(testName, testFn) {
     const elapsed = Date.now() - startAll;
     // Offline stub performance guard when using placeholder token
     if (TEST_CONFIG.apiKey === 'test-api-key') {
-      if (elapsed > 2000) {
-        throw new Error(`offline_stub_slow: ${elapsed}ms > 2000ms for ${testName}`);
+      if (elapsed > TEST_CONFIG.offlinePerfBudgetMs) {
+        throw new Error(`offline_stub_slow: ${elapsed}ms > ${TEST_CONFIG.offlinePerfBudgetMs}ms for ${testName}`);
       }
       if (!/^https?:\/\//.test(TEST_CONFIG.baseUrl)) {
         throw new Error(`invalid_base_url: ${TEST_CONFIG.baseUrl}`);

@@ -107,7 +107,7 @@ export async function opFetch<T = any>(
   path: string,
   opts: FetchOptions = {},
 ): Promise<{ res: Response; json: T }> {
-  const base = env.OP_BASE_URL?.trim();
+  let base = env.OP_BASE_URL?.trim();
   if (!base) {throw new Error("OP_BASE_URL not configured");}
   if (!/^https:/.test(base) && env.OP_ALLOW_INSECURE_HTTP !== 'true') {
     throw new Error('Insecure OP_BASE_URL requires OP_ALLOW_INSECURE_HTTP=true');
@@ -115,8 +115,21 @@ export async function opFetch<T = any>(
   const token = env.OP_TOKEN?.trim() || (env as any).OP_API_KEY?.trim();
   if (!token) {throw new Error("OP_TOKEN not configured (expected OP_TOKEN or OP_API_KEY)");}
 
-  // Offline test stub: when using placeholder token value we synthesize minimal API responses
-  const offlineMode = token === 'test-api-key';
+  // Development host auto-rewrite (placeholder -> fallback) when enabled
+  try {
+    if (typeof process !== 'undefined' && process.env?.OP_BASE_URL_AUTO_REWRITE === 'true') {
+      const placeholderHosts = ['thisistheway.local'];
+      const u = new URL(base);
+      if (placeholderHosts.includes(u.host)) {
+        const fallback = process.env.DEV_HOST_FALLBACK || 'https://127.0.0.1';
+        base = fallback.replace(/\/$/, '');
+        log.debug('opFetch_host_rewrite', { original: env.OP_BASE_URL, rewritten: base });
+      }
+    }
+  } catch {}
+
+  // Offline test stub: only active for test or explicit dev mode
+  const offlineMode = (token === 'test-api-key') && (typeof process !== 'undefined') && ((process.env.NODE_ENV === 'test') || (process.env.DEV_MODE === 'true'));
   if (offlineMode) {
     const synth = (body: any, status = 200) => {
       const res = new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/hal+json' } });

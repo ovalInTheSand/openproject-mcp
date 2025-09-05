@@ -577,6 +577,23 @@ sudo iptables -A INPUT -j DROP
 
 ---
 
-**Last Updated:** August 2025  
+## Environment Variables (Summary)
+
+| Name | Required | Default | Purpose |
+|------|----------|---------|---------|
+| OP_BASE_URL | Yes | — | Base URL of OpenProject instance |
+| OP_TOKEN | Yes | — | API token / shared secret auth |
+| ALLOWED_ORIGINS | Yes | — | Comma list of allowed browser origins (CORS + SSE) |
+| MCP_RATE_LIMIT | No | 200 | Requests per window per IP |
+| MCP_HMAC_SECRET | No | — | Enables HMAC (x-mcp-signature/timestamp/nonce) |
+| MCP_MAX_BODY_BYTES | No | 524288 | Payload size guard |
+| OP_BASE_URL_AUTO_REWRITE | No | false | Dev placeholder host auto rewrite |
+| DEV_HOST_FALLBACK | No | https://127.0.0.1 | Fallback host when auto rewrite enabled |
+| MCP_OFFLINE_PERF_BUDGET_MS | No | 2500 | Offline stub latency budget (tests) |
+| DEV_MODE | No | false | Allow offline stubs outside NODE_ENV=test |
+| SENTRY_DSN | No | — | Error reporting DSN |
+| SENTRY_TRACES_SAMPLE_RATE | No | 0.0 | Performance tracing sample rate |
+
+**Last Updated:** September 2025  
 **Your Environment:** thisistheway.local  
-**Package Version:** v2.0.0 Professional Private Use
+**Package Version:** v3.4.1 Hardening Snapshot

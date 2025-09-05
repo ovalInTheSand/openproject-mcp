@@ -17,26 +17,43 @@ type Bindings = {
 
 const app = new Hono<{ Bindings: Bindings }>();
 
-// CORS: allow inspector origins + mcp-session-id header + SSE headers
+// Unified CORS/SSE config including security & HMAC headers
 const corsConfig = {
   origin: (origin: string | undefined, c: any) => {
     const allow = c.env.ALLOWED_ORIGINS?.split(',').map((s: string) => s.trim()).filter(Boolean) ?? [];
-    if (!allow.length) {return '';}
-    if (!origin) {return allow[0];}
+    if (!allow.length) { return ''; }
+    if (!origin) { return allow[0]; }
     return allow.includes(origin) ? origin : '';
   },
-  allowHeaders: ["Content-Type", "mcp-session-id", "Last-Event-ID", "Cache-Control", "x-mcp-auth"],
-  allowMethods: ["GET", "POST", "DELETE", "OPTIONS"],
-  exposeHeaders: ["Content-Type", "Cache-Control"],
+  allowHeaders: [
+    'content-type',
+    'authorization',
+    'mcp-protocol-version',
+    'mcp-session-id',
+    'x-mcp-auth',
+    'x-mcp-signature',
+    'x-mcp-timestamp',
+    'x-mcp-nonce',
+    'cache-control',
+    'last-event-id'
+  ],
+  allowMethods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
+  exposeHeaders: ['content-type', 'cache-control'],
 };
 
 app.use("/mcp", cors(corsConfig));
 // Phase 2 security middleware (rate limit, headers, size limit, optional auth)
+// Dynamic auth requirement (auto true when MCP_SERVER_TOKEN or MCP_HMAC_SECRET set at process runtime)
+const dynamicAuth = (() => {
+  try { if (typeof process !== 'undefined' && process.env) { return Boolean(process.env.MCP_SERVER_TOKEN || process.env.MCP_HMAC_SECRET); } } catch { /* workers */ }
+  return false;
+})();
+
 app.use('*', securityMiddleware({
   requestsPerWindow: 200,
   windowMs: 60_000,
   maxBodyBytes: 512 * 1024,
-  requireAuthHeader: false
+  requireAuthHeader: dynamicAuth
 }));
 
 // Optional SSE route (disabled by default per project philosophy)

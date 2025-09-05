@@ -3,9 +3,20 @@ import type { Context, Next } from 'hono';
 import { recordRequest, recordRateLimited, recordHmacFailure } from '../observability/metrics';
 import { log } from '../util/logger';
 
-// In-memory rate limit store (per process). For production, replace with durable store.
+// Rate limit store interface (pluggable for Durable Objects/KV/Redis)
+export interface RateLimitStore {
+  get(key: string): Promise<{ count: number; reset: number } | undefined> | { count: number; reset: number } | undefined;
+  set(key: string, value: { count: number; reset: number }): Promise<void> | void;
+  incr?(key: string): Promise<{ count: number; reset: number }>; // optional optimized increment
+}
 type RateRecord = { count: number; reset: number };
-const rateMap = new Map<string, RateRecord>();
+class InMemoryRateLimitStore implements RateLimitStore {
+  private map = new Map<string, RateRecord>();
+  get(key: string) { return this.map.get(key); }
+  set(key: string, value: RateRecord) { this.map.set(key, value); }
+  async incr(key: string) { const rec = this.map.get(key); if (!rec) { throw new Error('incr_before_set'); } rec.count += 1; return rec; }
+}
+const defaultRateStore: RateLimitStore = new InMemoryRateLimitStore();
 
 export interface SecurityOptions {
   requestsPerWindow: number;      // e.g. 100
@@ -21,7 +32,7 @@ function readInt(env: any, key: string, fallback: number): number {
   return Number.isFinite(n) && n > 0 ? n : fallback;
 }
 
-export function securityMiddleware(base: SecurityOptions) {
+export function securityMiddleware(base: SecurityOptions & { rateStore?: RateLimitStore }) {
   // HMAC / nonce replay store
   type NonceRec = { ts: number };
   const nonceCache = new Map<string, NonceRec>();
@@ -71,11 +82,13 @@ export function securityMiddleware(base: SecurityOptions) {
       requireAuthHeader: base.requireAuthHeader || !!(c.env as any)?.MCP_SERVER_TOKEN
     };
 
-    const rec = rateMap.get(key);
+    const store = base.rateStore || defaultRateStore;
+    let rec = await Promise.resolve(store.get(key));
     if (!rec || rec.reset < now) {
-      rateMap.set(key, { count: 1, reset: now + opts.windowMs });
+      rec = { count: 1, reset: now + opts.windowMs };
+      await Promise.resolve(store.set(key, rec));
     } else {
-      rec.count++;
+      if (store.incr) { rec = await store.incr(key); } else { rec.count++; }
       if (rec.count > opts.requestsPerWindow) {
         const retryAfterMs = rec.reset - now;
         c.header('Retry-After', String(Math.ceil(retryAfterMs / 1000)));
