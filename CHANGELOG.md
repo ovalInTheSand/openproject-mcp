@@ -5,6 +5,32 @@ All notable changes to the OpenProject MCP Server will be documented in this fil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.4.1] - 2025-09-05
+
+### 🔐 Security & Operational Hardening (Additive)
+- Unified CORS & SSE header policy (no wildcard; parity for auth/HMAC headers, credentials, methods).
+- Dynamic auth enablement: automatically requires `Authorization` when `MCP_SERVER_TOKEN` or `MCP_HMAC_SECRET` present (zero-config secure by default).
+- Pluggable rate limiting store abstraction (`RateLimitStore`) enabling external backends (Redis, KV) beyond in‑memory default.
+- Host auto‑rewrite safety (`OP_BASE_URL_AUTO_REWRITE` + `DEV_HOST_FALLBACK`) for placeholder development endpoints.
+- Offline mock gating tightened: test stub only activates with `test-api-key` and test/dev environment, preventing accidental production mock usage.
+- ISO‑8601 duration schema relaxed to support broader valid patterns (e.g. `P2D`, `P3DT4H30M`, `PT45M`).
+- Performance budget externalized via `MCP_OFFLINE_PERF_BUDGET_MS` (replaces hardcoded threshold in performance test).
+
+### 🧪 Testing
+- Added dedicated `security-cors` test ensuring CORS/SSE parity and auth enforcement.
+- Updated cache performance test to use env-driven budget.
+- Integration tests skip gracefully when unresolved placeholder hosts are detected.
+
+### 📄 Documentation & Env Templates
+- README & deployment guide updated with new environment variables and security behavior notes.
+- `.env.example` extended with auto-rewrite, fallback host, and performance budget entries.
+
+### Migration / Upgrade Notes
+Purely additive; no breaking API changes. Deploy by bumping to 3.4.1 and (optionally) supplying new env variables for host rewrite or performance tuning. If relying on stricter old duration validation, note the schema now accepts additional valid ISO‑8601 variants (no action required for compliant inputs).
+
+### Integrity
+Validated via build, targeted security CORS test, and performance budget test using `MCP_OFFLINE_PERF_BUDGET_MS=3000`. All prior 3.4.0 features unchanged.
+
 ## [2.0.0] - 2025-08-28
 
 ## [3.2.0] - 2025-08-30
